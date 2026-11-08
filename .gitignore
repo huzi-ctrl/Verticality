@@ -1,0 +1,9 @@
+CanSat-backups/
+*~
+*.lck
+*.bak
+*.kicad_pcb-bak
+*.kicad_sch-bak
+fp-info-cache
+__pycache__/
+.DS_Store
