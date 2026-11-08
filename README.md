@@ -1,4 +1,9 @@
-# CanSat Team Verticality — RP2040 Avionics & Bioluminescence Payload PCB
+# Verticality — RP2040 CanSat Avionics & Bioluminescence Payload PCB
+
+[![View PCB on KiCanvas](https://hack.club/pcb-badge)](https://kicanvas.org/?repo=https://github.com/huzi-ctrl/Verticality/tree/main/pcb)
+
+> **Project Summary (>100 Characters):**
+> Custom 4-layer RP2040 CanSat flight computer and *Pyrocystis lunula* bioluminescence payload PCB (`45×42 mm`) featuring dual TSL2591 dark-chamber lux sensors, closed-loop PID thermal control, BMP280 barometer, ADXL375 ±200g shock IMU, MG90S servo release, and 433 MHz Ra-02 LoRa telemetry.
 
 ![3D Angled Render of CanSat PCB](images/pcb_angled_3d.png)
 
