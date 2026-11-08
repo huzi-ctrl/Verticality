@@ -5,13 +5,13 @@
 	(constraint clearance (min 0.127mm))
 	(constraint track_width (min 0.127mm))
 	(constraint via_diameter (min 0.4mm))
-	(constraint hole_size (min 0.2mm))
+	(constraint hole_size (min 0.3mm))
 )
 
 (rule "Via size outside fanout"
 	(condition "A.Type == 'Via' && !A.insideArea('RP2040_FANOUT')")
 	(constraint via_diameter (min 0.45mm))
-	(constraint hole_size (min 0.2mm))
+	(constraint hole_size (min 0.3mm))
 )
 
 (rule "HighCurrent width"
