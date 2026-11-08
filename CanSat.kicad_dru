@@ -8,6 +8,17 @@
 	(constraint hole_size (min 0.2mm))
 )
 
+(rule "Via size outside fanout"
+	(condition "A.Type == 'Via' && !A.insideArea('RP2040_FANOUT')")
+	(constraint via_diameter (min 0.45mm))
+	(constraint hole_size (min 0.2mm))
+)
+
+(rule "HighCurrent width"
+	(condition "A.NetClass == 'HighCurrent' && A.Type == 'Track'")
+	(constraint track_width (min 0.6mm))
+)
+
 (rule "Board minimum outside RP2040 fanout"
 	(condition "!A.insideArea('RP2040_FANOUT') && !B.insideArea('RP2040_FANOUT')")
 	(constraint clearance (min 0.15mm))
@@ -29,9 +40,9 @@
 	(constraint disallow track)
 )
 
-(rule "USB pair skew"
-	(condition "A.insideArea('USB_ZONE') && A.NetClass == 'USB'")
-	(constraint diff_pair_uncoupled (max 2.0mm))
+(rule "USB skew"
+	(condition "A.NetClass == 'USB'")
+	(constraint skew (max 5mm))
 )
 
 (rule "Heater and servo clearance"

@@ -1,30 +1,39 @@
 """
 CanSat Team Verticality - Flight Controller & Bioluminescence Payload Firmware
 Target MCU: Raspberry Pi RP2040 (U1) + W25Q128JVS 16MB QSPI Flash (U2)
-Mission:
-  - Maintain Chamber A (experimental Pyrocystis lunula dinoflagellate culture) at 20.0 C
-    using closed-loop PID control on a 15 Ohm 2W heating resistor (R8 via Q1 AO3400A on GP8),
-    while Chamber B remains an unheated ambient flight control.
+Reference Documents:
+  - LUSoM Team Verticality PDR (Updated v2)
+  - CanSat PCB Design Guide (Team Verticality Rev 2)
+Mission Summary:
+  - Maintain Chamber A (warmed experimental Pyrocystis fusiformis dinoflagellate culture;
+    UK backup species Pyrocystis lunula) at 22.0 +/- 1.0 C using closed-loop PID control
+    on an off-board 15 Ohm 2W axial resistor (R8 via Q1 AO3400A on GP8), while Chamber B
+    remains an unheated ambient flight control.
   - Measure bioluminescence emission intensity in both dark chambers using dual TSL2591
     sensors (U7 on I2C0 GP4/GP5, U8 on I2C1 GP6/GP7) at 9876x gain.
-  - Track ascent, apogee, descent rate, and high-G shock events via BMP280 (SPI1 CS=GP11)
+  - Track ascent, apogee, descent rate, and high-g shock/jerk via BMP280 (SPI1 CS=GP11)
     and ADXL375 +-200g accelerometer (SPI1 CS=GP13, INT1=GP22).
-  - Actuate MG90S landing-leg / mechanism release servo (J6) via low-side MOSFET power gate
-    (Q2 AO3400A on GP9) and 50 Hz PWM (GP10).
-  - Log full-rate CSV telemetry to onboard 16 MB QSPI flash and transmit 1 Hz LoRa
-    packets at 433.0 MHz via Ai-Thinker Ra-02 (SX1278 on SPI0 GP16..GP21).
+  - Execute the 5-state flight machine (0=SELF_TEST, 1=PAD, 2=BOOST, 3=DESCENT, 4=LANDED):
+      * 5 s RAM ring buffer in PAD, flushed to flash upon BOOST trigger (>25 m or >4 g).
+      * Pre-touchdown landing leg release in DESCENT via MG90S servo (Q2 on GP9, PWM on GP10)
+        when altitude drops below 150.0 m above pad OR 15.0 s after apogee, whichever comes first
+        (locked out in SELF_TEST, PAD, and BOOST).
+  - Log full-rate CSV telemetry to onboard 16 MB QSPI flash and transmit 1 Hz 34-byte
+    little-endian binary LoRa frames with CRC-16-CCITT at 433.175 MHz (SF8, BW125, CR4/5).
 """
 
+import math
+import struct
 import time
 from machine import ADC, I2C, PWM, SPI, Pin, UART
 from sensors import ADXL375_SPI, BMP280_SPI, TSL2591_I2C, read_battery_voltage, read_ntc_temp_c
 from sx1278 import SX1278
 
 # ==============================================================================
-# 1.Exact Schematic Pin Definitions (CanSat.kicad_sch)
+# 1. Exact Schematic Pin Definitions (CanSat.kicad_sch)
 # ==============================================================================
-PIN_UART_TX = 0       # GP0 -> /RX (TP4 UART debug)
-PIN_UART_RX = 1       # GP1 -> /TX (TP5 UART debug)
+PIN_UART_TX = 0       # GP0 -> /RX (TP4 UART debug, MCU TX)
+PIN_UART_RX = 1       # GP1 -> /TX (TP5 UART debug, MCU RX)
 
 PIN_INT_A = 2         # GP2 -> /INT_A (U7 TSL2591 Chamber A interrupt)
 PIN_INT_B = 3         # GP3 -> /INT_B (U8 TSL2591 Chamber B interrupt)
@@ -58,27 +67,98 @@ PIN_NTC_A = 27        # GP27 / ADC1 -> /NTC_A      (TH1 Chamber A 10k NTC)
 PIN_NTC_B = 28        # GP28 / ADC2 -> /NTC_B      (TH2 Chamber B 10k NTC)
 
 # ==============================================================================
-# 2. Flight State Machine & Thermal PID Controller
+# 2. PDR Flight States (Appendix A & Appendix D)
 # ==============================================================================
-STATE_PREFLIGHT = 0
-STATE_ASCENT = 1
-STATE_DESCENT = 2
-STATE_LANDED_DEPLOY = 3
-STATE_BIOLUM_OPS = 4
+STATE_SELF_TEST = 0
+STATE_PAD = 1
+STATE_BOOST = 2
+STATE_DESCENT = 3
+STATE_LANDED = 4
 
 STATE_NAMES = {
-    STATE_PREFLIGHT: "PREFLIGHT",
-    STATE_ASCENT: "ASCENT",
+    STATE_SELF_TEST: "SELF_TEST",
+    STATE_PAD: "PAD",
+    STATE_BOOST: "BOOST",
     STATE_DESCENT: "DESCENT",
-    STATE_LANDED_DEPLOY: "DEPLOY",
-    STATE_BIOLUM_OPS: "BIOLUM",
+    STATE_LANDED: "LANDED",
 }
+
+# 34-byte little-endian binary telemetry frame format (PDR Appendix D):
+#   0..1   pkt_num            uint16 (H)
+#   2      state              uint8  (B)
+#   3..6   mission_time_ms    uint32 (I)
+#   7..10  pressure_pa        uint32 (I)
+#   11..12 air_temp_c_x100    int16  (h)
+#   13..14 chamber_a_temp_x100 int16 (h)
+#   15..16 chamber_b_temp_x100 int16 (h)
+#   17..20 light_a            uint32 (I)
+#   21..24 light_b            uint32 (I)
+#   25..26 peak_accel_g_x10   uint16 (H)
+#   27..28 rms_jerk_gps       uint16 (H)
+#   29..30 battery_mv         uint16 (H)
+#   31     heater_duty_pct    uint8  (B)
+#   32..33 crc16              uint16 (H)
+TELEM_STRUCT_NO_CRC = "<HBIIhhhIIHHHB"
+TELEM_STRUCT_FULL = "<HBIIhhhIIHHHBH"
+
+
+def crc16_ccitt(data_bytes, poly=0x1021, init_val=0xFFFF):
+    """Compute 16-bit CRC-CCITT over data_bytes (bytes 0..31 of the 34-byte frame)."""
+    crc = init_val
+    for b in data_bytes:
+        crc ^= (b & 0xFF) << 8
+        for _ in range(8):
+            if crc & 0x8000:
+                crc = ((crc << 1) ^ poly) & 0xFFFF
+            else:
+                crc = (crc << 1) & 0xFFFF
+    return crc
+
+
+def pack_telemetry_frame(
+    pkt_num,
+    state,
+    mission_time_ms,
+    pressure_pa,
+    air_temp_c,
+    chamber_a_c,
+    chamber_b_c,
+    light_a_counts,
+    light_b_counts,
+    peak_accel_g,
+    rms_jerk_gps,
+    vbat_v,
+    heater_pct,
+):
+    """Pack the 34-byte little-endian binary telemetry frame with CRC-16 (PDR Appendix D)."""
+    body = struct.pack(
+        TELEM_STRUCT_NO_CRC,
+        pkt_num & 0xFFFF,
+        state & 0xFF,
+        mission_time_ms & 0xFFFFFFFF,
+        max(0, int(round(pressure_pa))),
+        max(-32768, min(32767, int(round(air_temp_c * 100.0)))),
+        max(-32768, min(32767, int(round(chamber_a_c * 100.0)))),
+        max(-32768, min(32767, int(round(chamber_b_c * 100.0)))),
+        max(0, int(light_a_counts)) & 0xFFFFFFFF,
+        max(0, int(light_b_counts)) & 0xFFFFFFFF,
+        max(0, min(65535, int(round(peak_accel_g * 10.0)))),
+        max(0, min(65535, int(round(rms_jerk_gps)))),
+        max(0, min(65535, int(round(vbat_v * 1000.0)))),
+        max(0, min(100, int(round(heater_pct)))),
+    )
+    crc = crc16_ccitt(body)
+    return body + struct.pack("<H", crc)
 
 
 class HeaterPID:
-    """PI-D thermal controller for Chamber A 15-Ohm 2W heater (target 20.0 C)."""
+    """
+    PI-D thermal controller for Chamber A 15-Ohm 2W heater.
+    Target setpoint: 22.0 +/- 1.0 C (PDR Section 2.1 & Requirement S2).
+    Safety cut-outs: battery < 3.50 V or Chamber A >= 30.0 C.
+    """
 
-    def __init__(self, setpoint_c=20.0, kp=18.0, ki=0.8, kd=4.0):
+    def __init__(self, setpoint_c=22.0, kp=20.0, ki=0.9, kd=4.0):
         self.setpoint = setpoint_c
         self.kp = kp
         self.ki = ki
@@ -87,8 +167,7 @@ class HeaterPID:
         self.prev_err = 0.0
 
     def update(self, temp_c, dt_s, vbat_v):
-        # Protect Li-Ion battery from deep discharge (< 3.35 V) or thermal runaway (> 26 C)
-        if vbat_v < 3.35 or temp_c >= 26.0:
+        if vbat_v < 3.50 or temp_c >= 30.0:
             self.integral = 0.0
             return 0.0
         err = self.setpoint - temp_c
@@ -103,8 +182,12 @@ class HeaterPID:
         return max(0.0, min(100.0, out_pct))
 
 
-def set_servo_angle(servo_pwr_pin, servo_pwm, angle_deg, hold_ms=600):
-    """Power on MG90S via Q2 low-side switch, command PWM angle, then cut power to save battery."""
+def release_landing_legs(servo_pwr_pin, servo_pwm, angle_deg=120.0, hold_ms=700):
+    """
+    Release the 3 spring-loaded curved landing legs in DESCENT before touchdown
+    (at 150 m above pad or 15 s post-apogee). Powers MG90S via Q2 AO3400A low-side
+    switch for hold_ms, then cuts power so idle servo current is 0 mA.
+    """
     duty_us = int(500 + (max(0.0, min(180.0, angle_deg)) / 180.0) * 2000)
     servo_pwr_pin.value(1)
     servo_pwm.duty_ns(duty_us * 1000)
@@ -122,7 +205,7 @@ def main():
     heater_pwm.freq(1000)
     heater_pwm.duty_u16(0)
 
-    # Servo power gate (GP9) & 50 Hz PWM (GP10)
+    # Servo power gate (GP9) & 50 Hz PWM (GP10) - strictly OFF at boot
     servo_pwr = Pin(PIN_SERVO_PWR, Pin.OUT, value=0)
     servo_pwm = PWM(Pin(PIN_SERVO_PWM))
     servo_pwm.freq(50)
@@ -136,7 +219,7 @@ def main():
     # SPI1 for BMP280 (U6) and ADXL375 (U4)
     cs_press = Pin(PIN_PRESS_CS, Pin.OUT, value=1)
     cs_imu = Pin(PIN_IMU_CS, Pin.OUT, value=1)
-    imu_int1 = Pin(PIN_IMU_INT1, Pin.IN, Pin.PULL_DOWN)
+    Pin(PIN_IMU_INT1, Pin.IN, Pin.PULL_DOWN)
     spi1 = SPI(
         1,
         baudrate=2_000_000,
@@ -147,6 +230,8 @@ def main():
         miso=Pin(PIN_SPI1_MISO),
     )
 
+    # State 0: SELF_TEST
+    state = STATE_SELF_TEST
     bmp = None
     imu = None
     try:
@@ -177,7 +262,7 @@ def main():
     except Exception as e:
         print("TSL2591 Chamber B init warning:", e)
 
-    # SPI0 for Ai-Thinker Ra-02 SX1278 LoRa (U5)
+    # SPI0 for Ai-Thinker Ra-02 SX1278 LoRa (U5) at 433.175 MHz (SF8, BW125, CR4/5)
     spi0 = SPI(
         0,
         baudrate=4_000_000,
@@ -194,33 +279,51 @@ def main():
             cs=Pin(PIN_RA_CS, Pin.OUT, value=1),
             rst=Pin(PIN_RA_RESET, Pin.OUT, value=1),
             dio0=Pin(PIN_RA_DIO0, Pin.IN),
-            freq_mhz=433.0,
+            freq_mhz=433.175,
             tx_power_dbm=17,
         )
     except Exception as e:
         print("SX1278 LoRa init warning:", e)
 
-    # Baseline ground altitude calibration
+    # Calibrate ground baseline altitude (alt_0)
     ground_alt_m = 0.0
     if bmp is not None:
         _, _, ground_alt_m = bmp.read()
 
-    pid = HeaterPID(setpoint_c=20.0)
-    state = STATE_PREFLIGHT
-    max_rel_alt_m = 0.0
-    landed_stable_count = 0
-    pkt_id = 0
-    prev_ms = time.ticks_ms()
+    pid = HeaterPID(setpoint_c=22.0)
+    # Self-test complete -> transition to State 1: PAD
+    state = STATE_PAD
+
+    alt_max_m = 0.0
+    prev_alt_m = 0.0
+    t_apogee_ms = 0
+    legs_deployed = False
+    landed_stable_s = 0.0
+
+    # 5-second RAM ring buffer (25 entries at 5 Hz loop rate) for pre-launch capture
+    ring_buffer = []
+    RING_BUFFER_MAX = 25
+
+    pkt_num = 0
+    boot_ms = time.ticks_ms()
+    prev_ms = boot_ms
+    last_tx_ms = boot_ms
+    prev_amag_g = 1.0
+    window_peak_g = 1.0
+    jerk_sq_sum = 0.0
+    jerk_samples = 0
 
     log_file = open("flight_log.csv", "a")
     log_file.write(
-        "pkt,ms,state,vbat_v,temp_bmp_c,press_hpa,rel_alt_m,ax_g,ay_g,az_g,amag_g,"
-        "ntc_a_c,ntc_b_c,heater_pct,lux_a_mlux,lux_b_mlux\n"
+        "pkt_num,state,mission_time_ms,pressure_pa,air_temp_c,chamber_a_c,chamber_b_c,"
+        "light_a,light_b,peak_accel_g,rms_jerk_gps,battery_mv,heater_duty_pct,"
+        "rel_alt_m,legs_deployed,crc16_hex\n"
     )
 
     while True:
         now_ms = time.ticks_ms()
-        dt_s = max(0.05, time.ticks_diff(now_ms, prev_ms) / 1000.0)
+        mission_time_ms = time.ticks_diff(now_ms, boot_ms)
+        dt_s = max(0.02, time.ticks_diff(now_ms, prev_ms) / 1000.0)
         prev_ms = now_ms
 
         vbat_v = read_battery_voltage(adc_vbat)
@@ -229,60 +332,126 @@ def main():
 
         if bmp is not None:
             temp_bmp_c, press_hpa, abs_alt_m = bmp.read()
+            pressure_pa = press_hpa * 100.0
             rel_alt_m = abs_alt_m - ground_alt_m
         else:
-            temp_bmp_c, press_hpa, rel_alt_m = ntc_b_c, 1013.25, 0.0
+            temp_bmp_c, pressure_pa, rel_alt_m = ntc_b_c, 101325.0, 0.0
+
+        vz_mps = (rel_alt_m - prev_alt_m) / dt_s
+        prev_alt_m = rel_alt_m
 
         if imu is not None:
-            ax_g, ay_g, az_g, amag_g = imu.read_accel_g()
+            _, _, _, amag_g = imu.read_accel_g()
         else:
-            ax_g, ay_g, az_g, amag_g = 0.0, 0.0, 1.0, 1.0
+            amag_g = 1.0
 
-        mlux_a = lux_a.read_raw_and_lux()[3] if lux_a is not None else 0.0
-        mlux_b = lux_b.read_raw_and_lux()[3] if lux_b is not None else 0.0
+        if amag_g > window_peak_g:
+            window_peak_g = amag_g
+        jerk_gps = abs(amag_g - prev_amag_g) / dt_s
+        prev_amag_g = amag_g
+        jerk_sq_sum += jerk_gps * jerk_gps
+        jerk_samples += 1
+        rms_jerk_gps = math.sqrt(jerk_sq_sum / max(1, jerk_samples))
 
-        # Update thermal PID for Chamber A
+        light_a_counts = lux_a.read_raw_and_lux()[2] if lux_a is not None else 0
+        light_b_counts = lux_b.read_raw_and_lux()[2] if lux_b is not None else 0
+
+        # Update Chamber A thermal PID (22.0 +/- 1.0 C, cut-out at <3.5 V or >30 C)
         heater_pct = pid.update(ntc_a_c, dt_s, vbat_v)
         heater_pwm.duty_u16(int((heater_pct / 100.0) * 65535))
 
-        # Flight state machine transitions
-        if rel_alt_m > max_rel_alt_m:
-            max_rel_alt_m = rel_alt_m
+        # Track maximum relative altitude
+        if rel_alt_m > alt_max_m:
+            alt_max_m = rel_alt_m
 
-        if state == STATE_PREFLIGHT:
-            if rel_alt_m > 15.0 or amag_g > 3.0:
-                state = STATE_ASCENT
-        elif state == STATE_ASCENT:
-            if (max_rel_alt_m - rel_alt_m) > 10.0:
+        # ======================================================================
+        # PDR Flight State Machine Transitions (Appendix A)
+        # ======================================================================
+        if state == STATE_PAD:
+            # Servo strictly locked out on PAD
+            servo_pwr.value(0)
+            if rel_alt_m > 25.0 or amag_g > 4.0:
+                state = STATE_BOOST
+                # Flush 5-second pre-launch RAM ring buffer to flash
+                for buffered_line in ring_buffer:
+                    log_file.write(buffered_line + "\n")
+                ring_buffer.clear()
+                log_file.flush()
+
+        elif state == STATE_BOOST:
+            # Servo strictly locked out during BOOST
+            servo_pwr.value(0)
+            if rel_alt_m < (alt_max_m - 5.0):
                 state = STATE_DESCENT
-        elif state == STATE_DESCENT:
-            if rel_alt_m < 25.0 and abs(amag_g - 1.0) < 0.35:
-                landed_stable_count += 1
-                if landed_stable_count >= 5 or imu_int1.value() == 1:
-                    state = STATE_LANDED_DEPLOY
-            else:
-                landed_stable_count = 0
-        elif state == STATE_LANDED_DEPLOY:
-            # Release landing mechanism / legs via MG90S servo
-            set_servo_angle(servo_pwr, servo_pwm, 120.0, hold_ms=700)
-            state = STATE_BIOLUM_OPS
+                t_apogee_ms = now_ms
 
-        pkt_id += 1
+        elif state == STATE_DESCENT:
+            # Pre-touchdown leg release: < 150 m above pad OR >= 15 s after apogee
+            if not legs_deployed:
+                post_apogee_ms = time.ticks_diff(now_ms, t_apogee_ms)
+                if rel_alt_m < 150.0 or post_apogee_ms >= 15_000:
+                    release_landing_legs(servo_pwr, servo_pwm, angle_deg=120.0, hold_ms=700)
+                    legs_deployed = True
+
+            # Touchdown detection: |vz| < 0.4 m/s for 5 s
+            if abs(vz_mps) < 0.4 and rel_alt_m < 30.0:
+                landed_stable_s += dt_s
+                if landed_stable_s >= 5.0:
+                    state = STATE_LANDED
+            else:
+                landed_stable_s = 0.0
+
+        elif state == STATE_LANDED:
+            # Ensure legs are deployed if DESCENT was very brief in a low-altitude drop test
+            if not legs_deployed:
+                release_landing_legs(servo_pwr, servo_pwm, angle_deg=120.0, hold_ms=700)
+                legs_deployed = True
+
+        # Pack 34-byte binary frame with CRC-16
+        frame_bytes = pack_telemetry_frame(
+            pkt_num,
+            state,
+            mission_time_ms,
+            pressure_pa,
+            temp_bmp_c,
+            ntc_a_c,
+            ntc_b_c,
+            light_a_counts,
+            light_b_counts,
+            window_peak_g,
+            rms_jerk_gps,
+            vbat_v,
+            heater_pct,
+        )
+        crc_val = struct.unpack_from("<H", frame_bytes, 32)[0]
+
         csv_line = (
-            f"{pkt_id},{now_ms},{STATE_NAMES[state]},{vbat_v:.2f},"
-            f"{temp_bmp_c:.2f},{press_hpa:.2f},{rel_alt_m:.1f},"
-            f"{ax_g:.2f},{ay_g:.2f},{az_g:.2f},{amag_g:.2f},"
-            f"{ntc_a_c:.2f},{ntc_b_c:.2f},{heater_pct:.1f},"
-            f"{mlux_a:.2f},{mlux_b:.2f}"
+            f"{pkt_num},{STATE_NAMES[state]},{mission_time_ms},{int(round(pressure_pa))},"
+            f"{temp_bmp_c:.2f},{ntc_a_c:.2f},{ntc_b_c:.2f},"
+            f"{light_a_counts},{light_b_counts},{window_peak_g:.1f},{int(round(rms_jerk_gps))},"
+            f"{int(round(vbat_v * 1000.0))},{int(round(heater_pct))},"
+            f"{rel_alt_m:.1f},{int(legs_deployed)},0x{crc_val:04X}"
         )
 
-        log_file.write(csv_line + "\n")
-        if pkt_id % 5 == 0:
-            log_file.flush()
+        if state == STATE_PAD:
+            ring_buffer.append(csv_line)
+            if len(ring_buffer) > RING_BUFFER_MAX:
+                ring_buffer.pop(0)
+        else:
+            log_file.write(csv_line + "\n")
+            if pkt_num % 5 == 0:
+                log_file.flush()
 
-        uart.write(csv_line + "\r\n")
-        if lora is not None:
-            lora.send_packet(csv_line)
+        # Transmit 34-byte binary LoRa frame at 1 Hz (PDR Section 2.1)
+        if time.ticks_diff(now_ms, last_tx_ms) >= 1000:
+            last_tx_ms = now_ms
+            pkt_num = (pkt_num + 1) & 0xFFFF
+            uart.write(csv_line + "\r\n")
+            if lora is not None:
+                lora.send_packet(frame_bytes)
+            window_peak_g = amag_g
+            jerk_sq_sum = 0.0
+            jerk_samples = 0
 
         led.toggle()
         time.sleep_ms(200)

@@ -48,7 +48,7 @@ class SX1278:
     IRQ_RX_DONE_MASK = 0x40
     IRQ_PAYLOAD_CRC_ERROR_MASK = 0x20
 
-    def __init__(self, spi, cs, rst, dio0=None, freq_mhz=433.0, tx_power_dbm=17):
+    def __init__(self, spi, cs, rst, dio0=None, freq_mhz=433.175, tx_power_dbm=17):
         self.spi = spi
         self.cs = cs
         self.rst = rst
@@ -70,8 +70,8 @@ class SX1278:
 
         # BW=125 kHz (0x70), CR=4/5 (0x02), Explicit Header (0x00)
         self._write_reg(self.REG_MODEM_CONFIG_1, 0x72)
-        # SF=9 (0x90), CRC On (0x04)
-        self._write_reg(self.REG_MODEM_CONFIG_2, 0x94)
+        # SF=8 (0x80), CRC On (0x04) -> ~120 ms airtime for 34-byte frame (PDR Section 2.1)
+        self._write_reg(self.REG_MODEM_CONFIG_2, 0x84)
         # Private CanSat SyncWord
         self._write_reg(self.REG_SYNC_WORD, 0x12)
 

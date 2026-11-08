@@ -1,221 +1,231 @@
-# Verticality — RP2040 CanSat Avionics & Bioluminescence Payload PCB
+# CanSat — Team Verticality (RP2040 Avionics & Dinoflagellate Bioluminescence Payload)
 
-[![View PCB on KiCanvas](https://hack.club/pcb-badge)](https://kicanvas.org/?repo=https://github.com/huzi-ctrl/Verticality/tree/main/pcb)
+[![Interactive PCB Viewer (KiCanvas)](https://img.shields.io/badge/KiCanvas-Interactive_PCB_&_Schematic_Viewer-2ea44f?style=for-the-badge&logo=kicad&logoColor=white)](https://kicanvas.org/?github=https%3A%2F%2Fgithub.com%2Fhuzi-ctrl%2FVerticality%2Fblob%2Fmain%2FCanSat.kicad_pcb)
+[![KiCad 10.0](https://img.shields.io/badge/KiCad-10.0%204--Layer%2052mm%20Round%20PCB-314cb0?style=for-the-badge&logo=kicad&logoColor=white)](./CanSat.kicad_pcb)
+[![DRC & ERC](https://img.shields.io/badge/DRC_%26_ERC-0_Errors_%7C_0_Unconnected-brightgreen?style=for-the-badge)](./DRC.rpt)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](./LICENSE)
 
-> **Project Summary (>100 Characters):**
-> Custom 4-layer RP2040 CanSat flight computer and *Pyrocystis lunula* bioluminescence payload PCB (`45×42 mm`) featuring dual TSL2591 dark-chamber lux sensors, closed-loop PID thermal control, BMP280 barometer, ADXL375 ±200g shock IMU, MG90S servo release, and 433 MHz Ra-02 LoRa telemetry.
+**Team Verticality** (Lancaster University School of Mathematics — UK CanSat Competition) is a 4-layer **52.0 mm round** avionics and dual-chamber biological payload controller built from scratch around the **Raspberry Pi RP2040** microcontroller.
 
-![3D Angled Render of CanSat PCB](images/pcb_angled_3d.png)
-
-A custom **4-layer RP2040 flight computer and biological payload controller PCB** (`45.0 mm × 42.0 mm`) designed for **Team Verticality's CanSat mission**. In addition to primary atmospheric profiling and 433 MHz LoRa telemetry during rocket deployment and parachute descent, this board runs a dual-chamber astrobiology experiment measuring mechanical-stress and thermal effects on **bioluminescent marine dinoflagellates (*Pyrocystis lunula*)**.
-
----
-
-## 1. Mission Overview & How It Works
-
-### Primary Mission (Atmospheric Profiling & Flight Telemetry)
-During rocket ascent, apogee deployment, and parachute descent (~8–10 m/s), the onboard **Raspberry Pi RP2040** (`U1`) samples:
-- **Barometric Pressure & Temperature (`U6` BMP280 on `SPI1`)**: Computes real-time barometric altitude and vertical descent rate at 5 Hz.
-- **High-G 3-Axis Shock & Acceleration (`U4` ADXL375 ±200g on `SPI1`)**: Captures launch acceleration, deployment shock, and landing impact (with hardware shock interrupt routed to `GP22`).
-- **433 MHz LoRa Downlink (`U5` Ai-Thinker Ra-02 / SX1278 on `SPI0`)**: Transmits live CSV telemetry packets (`SF9, BW 125 kHz, CR 4/5`) to the ground station while logging full-rate telemetry to the onboard **16 MB Winbond W25Q128JVS QSPI NOR Flash (`U2`)**.
-
-### Secondary Mission (*Pyrocystis lunula* Bioluminescence & Thermal Regulation)
-*Pyrocystis lunula* produces blue-green bioluminescence (~474 nm) in response to shear/mechanical stress (launch acceleration, parachute opening, and landing impact), but its enzymatic luciferin-luciferase reaction is sensitive to cold upper-altitude temperatures:
-1. **Chamber A (Thermally Regulated Experimental Chamber)**:
-   - Heated by a **15 Ω 2W metal-oxide power resistor (`R8`)** switched directly from raw `/VBAT` via a low-$R_{DS(\text{on})}$ **AO3400A N-channel MOSFET (`Q1`)** driven by a 1 kHz PWM PID loop on `GP8`.
-   - Closed-loop temperature feedback is provided by a **10 kΩ NTC thermistor probe (`TH1`)** on `GP27 / ADC1`, maintaining the culture at **20.0 °C**.
-   - Bioluminescence photon flux inside the dark chamber is measured by an ultra-high-sensitivity **AMS TSL2591 digital light sensor (`U7`, 9876× gain)** on `I2C0` (`GP4`/`GP5`, interrupt on `GP2`).
-2. **Chamber B (Unheated Ambient Control Chamber)**:
-   - Identical optical geometry and *Pyrocystis lunula* culture volume, monitored by a second **10 kΩ NTC thermistor (`TH2`)** on `GP28 / ADC2` and a second **TSL2591 sensor (`U8`)** on `I2C1` (`GP6`/`GP7`, interrupt on `GP3`) without active heating.
-3. **Post-Landing Deployment (`J6` MG90S Servo)**:
-   - Upon touchdown detection (barometric altitude stabilization + `ADXL375` shock interrupt), the RP2040 enables low-side MOSFET **`Q2` (`AO3400A` on `GP9`)** and drives a 50 Hz PWM signal (`GP10`) to the **MG90S metal-gear micro servo (`J6`)** to actuate the post-landing mechanical release, then cuts servo power to eliminate idle current draw during extended post-landing bioluminescence monitoring.
+Our secondary mission investigates **stress-induced mechano-bioluminescence** in marine dinoflagellates (***Pyrocystis fusiformis*** primary species; ***Pyrocystis lunula*** from Darwin Biological UK as the verified UK-stocked backup species) during rocket boost, parachute deployment, descent, and landing impact:
+- **Chamber A (Warmed Experimental Culture)**: Actively maintained at **$22.0 \pm 1.0\text{ }^\circ\text{C}$** via a closed-loop PID controller driving an off-board $15\text{ }\Omega$, $2\text{ W}$ axial heating resistor (`R8`, switched by `Q1` `AO3400A` MOSFET at $1\text{ kHz}$ PWM) with a $10\text{ k}\Omega$ thin-film NTC thermistor (`TH1`). Safety cut-outs disable the heater if battery voltage drops below $3.50\text{ V}$ or Chamber A temperature reaches $30.0\text{ }^\circ\text{C}$.
+- **Chamber B (Unheated Ambient Control)**: Identical optical geometry and cell concentration, left unheated with a matched $10\text{ k}\Omega$ NTC thermistor (`TH2`) to isolate temperature effects from mechanical shear and jerk ($\text{d}a/\text{d}t$).
+- **Dual High-Sensitivity Optical Readout**: Two **AMS TSL2591** digital light sensor breakouts (`U7` on `I2C0`, `U8` on `I2C1` — separate hardware $\text{I}^2\text{C}$ buses because the `TSL2591` has a fixed `0x29` address) operating at $9876\times$ gain ($200\text{ ms}$ integration) inside light-tight black PETG chambers.
+- **Pre-Touchdown Landing Leg Deployment & Upright Recovery**: Three 3D-printed curved landing legs folded against the **$64\text{ mm} \times 110\text{ mm}$** three-tier PETG cylindrical shell are released **during `DESCENT` before touchdown** — at **$150\text{ m}$ above pad altitude or $15\text{ s}$ after apogee, whichever comes first** — via an `MG90S` semi-metal servo (`J6`, low-side power-gated by `Q2` `AO3400A` so idle servo current is $0\text{ mA}$). The legs swing out to a **$140\text{ mm}$ triangular stance** while a $\sim 62\text{ g}$ steel ballast hatch lowers the centre of gravity to $z = 34\text{ mm}$ ($27\text{ mm}$ below the $61\text{ mm}$ leg pivot plane, giving a $>44^\circ$ static tip-over angle) so the top-mounted $433\text{ MHz}$ helical antenna stays upright after landing.
 
 ---
 
-## 2. PCB Design & 4-Layer Stackup
+## 1. 3D PCB Renders & Layout Gallery
 
-| Top 3D Render (`F.Cu`) | Bottom 3D Render (`B.Cu`) |
-| :---: | :---: |
-| ![Top 3D Render](images/pcb_top_3d.png) | ![Bottom 3D Render](images/pcb_bottom_3d.png) |
-
-### Stackup & Layout Highlights
-- **Dimensions**: `45.0 mm × 42.0 mm` (fits horizontally inside the standard 66 mm diameter CanSat cylindrical structural bus with clearance for wiring and standoffs).
-- **4-Layer Stackup**:
-  - **`F.Cu` (Layer 1)**: High-speed QSPI (`U1` ↔ `U2`), 12 MHz crystal (`Y1`), SMD decoupling network, and primary component placement.
-  - **`In1.Cu` (Layer 2)**: Solid uninterrupted **`GND` reference plane** (`GND_PLANE_IN1`) providing low-inductance return paths for SPI, I2C, USB, and the 433 MHz LoRa RF module.
-  - **`In2.Cu` (Layer 3)**: Solid **`+3V3` power plane** (`+3V3_PLANE_IN2`) fed by the `MCP1700-3302E` 3.3 V LDO (`U3`).
-  - **`B.Cu` (Layer 4)**: Mitered $45^\circ$ orthogonal signal buses and high-current `/VBAT` distribution (`0.6 mm` traces) for the heater (`R8`) and servo (`J6`).
-- **RF & Clock Integrity**:
-  - Dedicated copper keepout zones under the **12 MHz SMD crystal (`Y1`)** on `F.Cu` and under the **Ai-Thinker Ra-02 (`U5`) antenna region** across all layers.
-  - Every `100 nF` decoupling capacitor (`C1`–`C8`, `C11`, `C13`, `C14`, `C16`, `C18`, `C19`, `C21`) is placed within **1.3 mm – 2.8 mm** of its target IC power pin.
-  - All trace corners use **$45^\circ$ mitered bends** and pass KiCad 10.0 DRC with **0 unconnected items** and **0 clearance/routing violations**.
-
-### 2D Layout (`F.Cu`, `B.Cu`, `F.SilkS`, `Edge.Cuts`)
-![2D PCB Layout](images/pcb_layout.svg)
+| Isometric 3D Render (`CanSat.kicad_pcb`) | Top View (`F.Cu` — RP2040, Flash, LDO, Ra-02, Power Stage) | Bottom View (`B.Cu` — Solid Ground Return & Signal Fanout) |
+| :---: | :---: | :---: |
+| ![3D Isometric PCB Render](./images/pcb_3d_iso.png) | ![Top PCB Render](./images/pcb_3d_top.png) | ![Bottom PCB Render](./images/pcb_3d_bottom.png) |
 
 ---
 
-## 3. Schematic & System Wiring
+## 2. Mechanical Architecture, Landing Legs & Power Budget
 
-### Full Circuit Schematic
-> 📄 **[Click here to open the full vector PDF schematic (`schematic.pdf`)](schematic.pdf)**
+### Three-Tier $64\text{ mm} \times 110\text{ mm}$ Shell & $52.0\text{ mm}$ Round PCB
+The satellite body is a **$64\text{ mm}$ outer diameter $\times 110\text{ mm}$ tall** three-tier 3D-printed PETG structure clamped by **three $115\text{ mm}$ M3 A2 stainless steel threaded tie-rods** (`H1`, `H2`, `H3` on a $22.5\text{ mm}$ bolt-circle radius at $90^\circ, 210^\circ, 330^\circ$) to a top bulkhead lifting eyebolt:
+1. **Top Tier ($40\text{ mm}$ height)**: Houses the **52.0 mm round 4-layer PCB**, the `Ai-Thinker Ra-02` ($433.175\text{ MHz}$ LoRa transceiver), U.FL pigtail, $21\text{ mm}$ helical antenna (`BW433SNX21-5W2`), `GY-BMP280-3.3` barometer (`U6`), and `Adafruit ADXL375` $\pm 200\text{ g}$ accelerometer (`U4`).
+2. **Middle Tier ($42\text{ mm}$ height)**: Contains the light-tight black PETG **Chamber A** (heated to $22 \pm 1\text{ }^\circ\text{C}$ via `R8` $15\text{ }\Omega$ $2\text{ W}$ axial resistor and `TH1` NTC) and **Chamber B** (unheated control with `TH2` NTC), each with a sealed dinoflagellate vial and dedicated `TSL2591` optical sensor (`U7`, `U8`).
+3. **Bottom Tier ($28\text{ mm}$ height)**: Houses the **flat `103450` $3.7\text{ V}$, $2000\text{ mAh}$ protected LiPo pouch cell** ($50 \times 34 \times 10\text{ mm}$ — selected specifically because a cylindrical 18650 cell is $65\text{ mm}$ long and cannot fit inside the $28\text{ mm}$ bottom tier or $64\text{ mm}$ diameter), the `MG90S` leg-release servo (`J6`), and the $\sim 62\text{ g}$ steel ballast hatch.
 
-![CanSat Schematic](images/CanSat.svg)
+### Pre-Touchdown Leg Release Mechanism
+- **Stowed Configuration**: Three curved 3D-printed PETG/TPU legs wrap flush against the outer wall during rocket integration and boost, held by a single nylon retention loop on the `MG90S` servo horn (`J6`).
+- **In-Air Release (`STATE_DESCENT`)**: The flight software strictly locks out `Q2` (`GP9 = 0`) during `SELF_TEST`, `PAD`, and `BOOST`. Once apogee is passed (`STATE_DESCENT`) and either **relative altitude drops below $150.0\text{ m}$ above the pad OR $15.0\text{ s}$ have elapsed since apogee**, `GP9` turns on `Q2` (`AO3400A`) for $700\text{ ms}$ while `GP10` drives a $50\text{ Hz}$ PWM command to rotate the `MG90S` horn $120^\circ$, releasing all three legs before touchdown.
+- **Self-Righting Geometry**: Torsion hinges open the three legs to a **$140\text{ mm}$ footprint** with hinges at $z = 61\text{ mm}$ above the base and the ballasted centre of gravity at $z = 34\text{ mm}$ ($27\text{ mm}$ below the pivot plane), providing a $>44^\circ$ static stability margin on uneven ground.
 
-### Off-Board Wiring Diagram
-```mermaid
-flowchart LR
-    subgraph Power["Off-Board Power"]
-        BAT["3.7V 18650 Li-Ion Cell\n(Protected 2600mAh)"] -->|JST-PH 2-Pin| J1["J1 Battery Input\n(SW1 Slide Switch)"]
-    end
+---
 
-    subgraph PCB["CanSat Avionics PCB (45x42mm)"]
-        J1 --> U3["U3 MCP1700-3302E\n3.3V LDO"]
-        J1 --> VBAT["/VBAT High-Current Rail"]
-        U3 --> U1["U1 RP2040 MCU\n+ U2 16MB QSPI Flash"]
-        U1 -->|SPI0| U5["U5 Ra-02 SX1278\n433 MHz LoRa"]
-        U1 -->|SPI1| U4["U4 ADXL375 ±200g IMU"]
-        U1 -->|SPI1| U6["U6 BMP280 Barometer"]
-        U1 -->|GP8 PWM| Q1["Q1 AO3400A MOSFET"]
-        U1 -->|GP9 Gate + GP10 PWM| Q2["Q2 AO3400A MOSFET"]
-    end
+## 3. 4-Layer PCB Stackup, Layout Rules & Audit Compliance
 
-    subgraph PayloadA["Dark Chamber A (Heated 20°C)"]
-        Q1 --> R8["R8 15Ω 2W Heater"]
-        TH1["TH1 10k NTC Probe A"] -->|2-Pin Header| U1
-        U7["U7 TSL2591 Lux Sensor A"] <-->|I2C0 GP4/GP5 + GP2| U1
-    end
+The board ([`CanSat.kicad_pcb`](./CanSat.kicad_pcb)) is a **52.0 mm diameter**, $1.6\text{ mm}$ thick 4-layer FR-4 PCB designed to JLCPCB 4-layer manufacturing rules and verified against [`reports/CanSat_PCB_Design_Guide__Team_Verticality__rev2.pdf`](./reports/CanSat_PCB_Design_Guide__Team_Verticality__rev2.pdf):
 
-    subgraph PayloadB["Dark Chamber B (Ambient Control)"]
-        TH2["TH2 10k NTC Probe B"] -->|2-Pin Header| U1
-        U8["U8 TSL2591 Lux Sensor B"] <-->|I2C1 GP6/GP7 + GP3| U1
-    end
+| Layer | Copper Name | Plane / Function | Design Notes |
+| :--- | :--- | :--- | :--- |
+| **Layer 1** | `F.Cu` | Top Component & High-Speed Signal Layer | All **46 SMT components** placed on top side only (single-sided JLCPCB Economic PCBA); $90\text{ }\Omega$ differential USB (`R2`/`R3` = $22\text{ }\Omega$), short QSPI (`U2`), `12MHz` crystal (`Y1` + $33\text{ pF}$ C0G load caps `C10`/`C11`), and `0.6 mm` high-current switched paths (`Net-(Q1-D)` and `Net-(J6-Pin_1)`). |
+| **Layer 2** | `In1.Cu` | Unbroken `GND` Reference Plane | Solid continuous ground reference plane beneath all high-speed, RF (`U5`), and analog (`ADC0..ADC2`) traces. |
+| **Layer 3** | `In2.Cu` | `+3V3` Power Plane | Solid $+3.3\text{ V}$ distribution plane fed by `U3` (`MCP1700-3302E/TO`), with an explicit keepout cutout (`XTAL_KEEPOUT`) beneath `Y1`, `C10`, `C11`, and `R1` so crystal signals reference only `In1.Cu` (`GND`). |
+| **Layer 4** | `B.Cu` | Bottom Signal Routing & `GND` Pour | Secondary signal fanout with stitched `GND` copper pour. Zero components on `B.Cu`. |
 
-    subgraph Mech["Mechanical & RF"]
-        Q2 -->|J6 3-Pin Header| SERVO["MG90S Metal-Gear Servo\n(Landing Leg Release)"]
-        U5 -->|IPEX / U.FL| ANT["433 MHz Helical/Whip Antenna"]
-    end
-```
+### Key Hardware & DFM Highlights
+- **Strict SMT vs. Hand-Fit / Wire-Pad Separation**:
+  - **46 SMT parts** (14 unique LCSC lines: 13 Basic + 1 Extended `RP2040` `C2040`, 157 SMT joints/board) have `LCSC` part numbers populated and are exported to [`production/bom_jlcpcb.csv`](./production/bom_jlcpcb.csv) and [`production/positions_jlcpcb.csv`](./production/positions_jlcpcb.csv).
+  - **All 29 non-SMT items** — hand-fitted through-hole/castellated parts (`U3`, `U5`, `C22`, `J1`, `SW1`, `R8`), DNP $\text{I}^2\text{C}$ pull-up footprints (`R18–R21`), off-board module wire-pad groups (`U4`, `U6`, `U7`, `U8`, `TH1`, `TH2`, `J2`, `J3`, `J4`, `J5`, `J6`), test points (`TP1–TP5`), and mounting holes (`H1–H3`) — have **both `Exclude from BOM` and `Exclude from Position Files`** set in [`CanSat.kicad_sch`](./CanSat.kicad_sch) and [`CanSat.kicad_pcb`](./CanSat.kicad_pcb).
+- **High-Current MOSFET Via Arrays & Trace Widths**:
+  - `Q1` (Heater `AO3400A`) and `Q2` (Servo `AO3400A`) each have **three `0.6 mm / 0.3 mm` `GND` vias** at their source pads (`Q1.2` and `Q2.2`) to handle the $\sim 1\text{ A}$ servo stall current and $250\text{ mA}$ heater current with minimal ground bounce.
+  - `HighCurrent` netclass contains only the switched drain paths `Net-(Q1-D)` and `Net-(J6-Pin_1)` routed at **`0.6 mm` width**, while the logic gate nets (`/HEATER`, `/SERVO_P`, `/SERVO_S`) use signal widths.
+- **Via Sizing, Wire-Pad Keepouts & Teardrops**:
+  - Every via on the board is **`0.45 mm / 0.20 mm` minimum** (`0.45/0.2`, `0.5/0.25`, and `0.6/0.3` — zero `0.4/0.2` vias remain), with `min_via_diameter: 0.45` enforced in [`CanSat.kicad_pro`](./CanSat.kicad_pro) and [`CanSat.kicad_dru`](./CanSat.kicad_dru).
+  - All 12 wire-pad groups (`J1/SW1`, `J2 BOOTSEL` using `CanSat_Modules:Pad_2pad_GND_SIG`, `J3 SWD`, `J4 USB`, `J5 RUN`, `J6 Servo`, `R8 Heater`, `TH1`, `TH2`, `U4`, `U6`, `U7`, `U8`) are protected by `WIRE_PADS` keepout zones prohibiting vias under solder pads, and teardrops are enabled on all pads and vias.
+- **Verified Zero-Error DRC & ERC**:
+  - [`DRC.rpt`](./DRC.rpt): **0 DRC violations, 0 unconnected pads, 0 footprint parity errors**.
+  - [`ERC.rpt`](./ERC.rpt): **0 ERC errors**.
 
-### RP2040 (`U1`) Complete Pinout Table
+---
+
+## 4. Complete RP2040 Pin Allocation & Wire-Pad Pin Orders
+
+### RP2040 (`U1`) GPIO & Peripheral Map
 
 | RP2040 Pin | GPIO / Function | Schematic Net | Connected Component & Function |
-| :--- | :--- | :--- | :--- |
-| Pin 2 | `GP0` (`UART0_TX`) | `/RX` | `TP4` Debug UART TX output |
-| Pin 3 | `GP1` (`UART0_RX`) | `/TX` | `TP5` Debug UART RX input |
-| Pin 4 | `GP2` | `/INT_A` | `U7` TSL2591 (Chamber A) Interrupt |
-| Pin 5 | `GP3` | `/INT_B` | `U8` TSL2591 (Chamber B) Interrupt |
-| Pin 6 | `GP4` (`I2C0_SDA`) | `/SDA0` | `U7` TSL2591 (Chamber A) SDA (`R18` 4.7 kΩ pull-up) |
-| Pin 7 | `GP5` (`I2C0_SCL`) | `/SCL0` | `U7` TSL2591 (Chamber A) SCL (`R19` 4.7 kΩ pull-up) |
-| Pin 8 | `GP6` (`I2C1_SDA`) | `/SDA1` | `U8` TSL2591 (Chamber B) SDA (`R21` 4.7 kΩ pull-up) |
-| Pin 9 | `GP7` (`I2C1_SCL`) | `/SCL1` | `U8` TSL2591 (Chamber B) SCL (`R20` 4.7 kΩ pull-up) |
-| Pin 11 | `GP8` (`PWM4_A`) | `/HEATER` | `Q1` (`AO3400A`) Gate via `R7` (`100 Ω`) → `R8` (`15 Ω 2W` Heater) |
-| Pin 12 | `GP9` | `/SERVO_P` | `Q2` (`AO3400A`) Gate via `R10` (`100 Ω`) → `J6.1` Servo Low-Side Power Switch |
-| Pin 13 | `GP10` (`PWM5_A`) | `/SERVO_S` | `J6.3` MG90S Servo 50 Hz PWM Signal (`R17` 100 kΩ pull-down) |
-| Pin 14 | `GP11` | `/PRESS_CS` | `U6` BMP280 Barometer SPI1 Chip Select |
-| Pin 15 | `GP12` (`SPI1_RX`) | `/IMU_MISO` | `U4` ADXL375 & `U6` BMP280 SPI1 MISO |
-| Pin 16 | `GP13` | `/IMU_CS` | `U4` ADXL375 Accelerometer SPI1 Chip Select |
-| Pin 17 | `GP14` (`SPI1_SCK`) | `/IMU_SCLK` | `U4` ADXL375 & `U6` BMP280 SPI1 Clock |
-| Pin 18 | `GP15` (`SPI1_TX`) | `/IMU_MOSI` | `U4` ADXL375 & `U6` BMP280 SPI1 MOSI |
-| Pin 27 | `GP16` (`SPI0_RX`) | `/RA_MISO` | `U5` Ai-Thinker Ra-02 (`SX1278`) LoRa SPI0 MISO |
-| Pin 28 | `GP17` (`SPI0_CSn`) | `/RA_CS` | `U5` Ai-Thinker Ra-02 (`SX1278`) LoRa SPI0 NSS (`R6` 10 kΩ pull-up) |
-| Pin 29 | `GP18` (`SPI0_SCK`) | `/RA_SCLK` | `U5` Ai-Thinker Ra-02 (`SX1278`) LoRa SPI0 SCK |
-| Pin 30 | `GP19` (`SPI0_TX`) | `/RA_MOSI` | `U5` Ai-Thinker Ra-02 (`SX1278`) LoRa SPI0 MOSI |
-| Pin 31 | `GP20` | `/RA_RESET` | `U5` Ai-Thinker Ra-02 (`SX1278`) LoRa Hardware Reset |
-| Pin 32 | `GP21` | `/RA_DIO0` | `U5` Ai-Thinker Ra-02 (`SX1278`) LoRa `DIO0` TX/RX Done IRQ |
-| Pin 34 | `GP22` | `/IMU_INT1` | `U4` ADXL375 `INT1` High-G Shock / Touchdown Interrupt |
-| Pin 37 | `GP25` | `/LED` | `D1` Green Status LED via `R12` (`1 kΩ`) |
-| Pin 38 | `GP26 / ADC0` | `/BATT_SENSE` | Battery Voltage Sense (`R15`/`R16` `100 kΩ / 100 kΩ` 2:1 divider + `C25` `100 nF`) |
-| Pin 39 | `GP27 / ADC1` | `/NTC_A` | `TH1` Chamber A `10 kΩ` NTC Thermistor (`R13` `10 kΩ` pull-up + `C23` `100 nF`) |
-| Pin 40 | `GP28 / ADC2` | `/NTC_B` | `TH2` Chamber B `10 kΩ` NTC Thermistor (`R14` `10 kΩ` pull-up + `C24` `100 nF`) |
-| Pins 46–47 | `USB_DM` / `USB_DP` | `/D-`, `/D+` | `J4` USB Header via `R3`/`R4` (`27 Ω` series termination) |
-| Pins 51–56 | `QSPI_SD0..3`, `CLK`, `SS` | `/SD0..3`, `/CLK`, `/SS` | `U2` W25Q128JVS 16 MB QSPI Flash + `J2` `BOOTSEL` Header |
+| :---: | :--- | :--- | :--- |
+| **Pin 2** | `GP0` (`UART0_TX`) | `/RX` | `TP4` UART Debug Header (MCU Transmit -> Adapter RX) |
+| **Pin 3** | `GP1` (`UART0_RX`) | `/TX` | `TP5` UART Debug Header (MCU Receive <- Adapter TX) |
+| **Pin 4** | `GP2` ( IRQ ) | `/INT_A` | `U7` (`TSL2591` Chamber A) Interrupt Output |
+| **Pin 5** | `GP3` ( IRQ ) | `/INT_B` | `U8` (`TSL2591` Chamber B) Interrupt Output |
+| **Pin 6** | `GP4` (`I2C0_SDA`) | `/SDA0` | `U7` (`TSL2591` Chamber A) $\text{I}^2\text{C}$ Data (`R18` DNP; pull-up on module) |
+| **Pin 7** | `GP5` (`I2C0_SCL`) | `/SCL0` | `U7` (`TSL2591` Chamber A) $\text{I}^2\text{C}$ Clock (`R19` DNP; pull-up on module) |
+| **Pin 8** | `GP6` (`I2C1_SDA`) | `/SDA1` | `U8` (`TSL2591` Chamber B) $\text{I}^2\text{C}$ Data (`R21` DNP; pull-up on module) |
+| **Pin 9** | `GP7` (`I2C1_SCL`) | `/SCL1` | `U8` (`TSL2591` Chamber B) $\text{I}^2\text{C}$ Clock (`R20` DNP; pull-up on module) |
+| **Pin 11** | `GP8` (`PWM4_A`) | `/HEATER` | `R7` ($100\text{ }\Omega$) & `R9` ($100\text{ k}\Omega$) $\rightarrow$ `Q1` (`AO3400A`) Gate $\rightarrow$ `R8` ($15\text{ }\Omega$ $2\text{ W}$ Chamber A Heater) |
+| **Pin 12** | `GP9` (GPIO Out) | `/SERVO_P` | `R10` ($100\text{ }\Omega$) & `R11` ($100\text{ k}\Omega$) $\rightarrow$ `Q2` (`AO3400A`) Gate $\rightarrow$ `J6` (`MG90S` Low-Side Power Switch) |
+| **Pin 13** | `GP10` (`PWM5_A`) | `/SERVO_S` | `R17` ($10\text{ k}\Omega$ pull-down) $\rightarrow$ `J6` Pin 3 (`MG90S` $50\text{ Hz}$ Servo PWM Signal) |
+| **Pin 14** | `GP11` (`SPI1_CSn`) | `/PRESS_CS` | `U6` (`GY-BMP280-3.3`) SPI Chip Select |
+| **Pin 15** | `GP12` (`SPI1_RX`) | `/IMU_MISO` | `U4` (`ADXL375`) & `U6` (`BMP280`) Shared `SPI1` MISO |
+| **Pin 16** | `GP13` (`SPI1_CSn`) | `/IMU_CS` | `U4` (`ADXL375` $\pm 200\text{ g}$ Accelerometer) SPI Chip Select |
+| **Pin 17** | `GP14` (`SPI1_SCK`) | `/IMU_SCLK` | `U4` (`ADXL375`) & `U6` (`BMP280`) Shared `SPI1` Clock |
+| **Pin 18** | `GP15` (`SPI1_TX`) | `/IMU_MOSI` | `U4` (`ADXL375`) & `U6` (`BMP280`) Shared `SPI1` MOSI |
+| **Pin 27** | `GP16` (`SPI0_RX`) | `/RA_MISO` | `U5` (`Ai-Thinker Ra-02` `SX1278` $433.175\text{ MHz}$ LoRa) MISO |
+| **Pin 28** | `GP17` (`SPI0_CSn`) | `/RA_CS` | `U5` (`Ai-Thinker Ra-02`) NSS / Chip Select |
+| **Pin 29** | `GP18` (`SPI0_SCK`) | `/RA_SCLK` | `U5` (`Ai-Thinker Ra-02`) SCK |
+| **Pin 30** | `GP19` (`SPI0_TX`) | `/RA_MOSI` | `U5` (`Ai-Thinker Ra-02`) MOSI |
+| **Pin 31** | `GP20` (GPIO Out) | `/RA_RESET` | `U5` (`Ai-Thinker Ra-02`) Hardware Reset |
+| **Pin 32** | `GP21` (GPIO In) | `/RA_DIO0` | `U5` (`Ai-Thinker Ra-02`) `DIO0` TxDone / RxDone IRQ |
+| **Pin 34** | `GP22` (GPIO In) | `/IMU_INT1` | `U4` (`ADXL375`) `INT1` High-G Shock Interrupt |
+| **Pin 37** | `GP25` (GPIO Out) | `/LED` | `R12` ($1\text{ k}\Omega$) $\rightarrow$ `D1` (`KT-0805G` Green Status LED) |
+| **Pin 38** | `GP26 / ADC0` | `/BATT_SENSE`| `R15` ($100\text{ k}\Omega$) / `R16` ($100\text{ k}\Omega$) $2:1$ Divider + `C25` ($100\text{ nF}$) from `/VBAT` |
+| **Pin 39** | `GP27 / ADC1` | `/NTC_A` | `R13` ($10\text{ k}\Omega$ to `+3V3`) + `C23` ($100\text{ nF}$) + `TH1` (Chamber A $10\text{ k}\Omega$ NTC) |
+| **Pin 40** | `GP28 / ADC2` | `/NTC_B` | `R14` ($10\text{ k}\Omega$ to `+3V3`) + `C24` ($100\text{ nF}$) + `TH2` (Chamber B $10\text{ k}\Omega$ NTC) |
+| **Pin 46/47**| `USB_DM / USB_DP` | `/D-`, `/D+` | `R2` ($22\text{ }\Omega$) & `R3` ($22\text{ }\Omega$) $\rightarrow$ `J4` (`USB_3pad_wire`) |
+| **Pin 51–56**| `QSPI_SD0..3, SCLK, SS` | `/SD0..3, /SCLK, /SS` | `U2` (`W25Q128JVSIQ` $16\text{ MB}$ QSPI Flash) + `R5` ($10\text{ k}\Omega$) + `R4` ($1\text{ k}\Omega$ to `J2` `BOOTSEL`) |
+
+### Off-Board Wire-Pad Pin Orders (Design Guide Rev 2 Section 6)
+
+| Footprint Ref | Module / Function | Pad Order on PCB |
+| :---: | :--- | :--- |
+| **`J1`** | Battery Input (`JST B2B-PH-K-S`) | `1 = /VBAT_R` (Battery $+$), `2 = GND` (Check LiPo red/black polarity before plugging in) |
+| **`SW1`** | Master Slide Switch (`SS-12D00G3`) | `1 = open`, `2 = /VBAT_R` (middle common pin), `3 = /VBAT` (switched rail) |
+| **`J2`** | `BOOTSEL` (`Pad_2pad_GND_SIG`) | `1 = GND`, `2 = Net-(J2-Pin_2)` (to `R4` $1\text{ k}\Omega \rightarrow \text{/SS}$) |
+| **`J3`** | `SWD` (`SWD_3pad`) | `1 = /SWDIO`, `2 = GND`, `3 = /SWCLK` |
+| **`J4`** | `USB` (`USB_3pad_wire`) | `1 = GND`, `2 = /D-`, `3 = /D+` (Board powered from battery during USB flashing) |
+| **`J5`** | `RUN` (`Pad_2pad_GND_SIG`) | `1 = GND`, `2 = /RUN` |
+| **`J6`** | `MG90S` Servo (`Pad_3pad_Servo`) | `1 = Net-(J6-Pin_1)` (switched GND via `Q2` — brown), `2 = /VBAT` (red), `3 = /SERVO_S` (orange) |
+| **`R8`** | Chamber A Heater ($15\text{ }\Omega$ $2\text{ W}$) | `1 = Net-(Q1-D)` (switched GND via `Q1`), `2 = /VBAT` |
+| **`TH1` / `TH2`** | Chamber A / B NTC ($10\text{ k}\Omega$) | `1 = /NTC_A` (or `/NTC_B`), `2 = GND` |
+| **`U4`** | `ADXL375` Breakout (`Pad_7pad_ADXL375`) | `1/6 = +3V3`, `2/4/5 = GND`, `7 = /IMU_CS`, `8 = /IMU_INT1`, `12 = /IMU_MISO`, `13 = /IMU_MOSI`, `14 = /IMU_SCLK` |
+| **`U6`** | `GY-BMP280-3.3` (`Pad_6pad_BMP280`) | `1/7 = GND`, `2 = /PRESS_CS`, `3 = /IMU_MOSI`, `4 = /IMU_SCLK`, `5 = /IMU_MISO`, `6/8 = +3V3` |
+| **`U7` / `U8`** | `TSL2591` Breakout A / B (`TSL2591_module_5pad`) | `1 = +3V3`, `2 = GND`, `3 = /SDA0` (`/SDA1`), `4 = /SCL0` (`/SCL1`), `5 = /INT_A` (`/INT_B`) |
 
 ---
 
-## 4. Firmware & Usage Instructions
+## 5. Firmware Architecture & 34-Byte Binary Telemetry Frame
 
-All flight and ground-station software is located in the [`firmware/`](firmware/) directory:
-- **[`firmware/main.py`](firmware/main.py)**: Complete RP2040 MicroPython flight state machine (`PREFLIGHT` → `ASCENT` → `DESCENT` → `DEPLOY` → `BIOLUM`), Chamber A PID thermal controller, flash CSV logger (`flight_log.csv`), and 433 MHz LoRa telemetry transmitter.
-- **[`firmware/sensors.py`](firmware/sensors.py)**: Hardware drivers for `BMP280` (`SPI1`), `ADXL375` (`SPI1` + shock interrupt), `TSL2591` (`I2C0`/`I2C1` at `9876x` bioluminescence gain), Steinhart-Hart `10k` NTC conversion, and Li-Ion battery voltage monitoring.
-- **[`firmware/sx1278.py`](firmware/sx1278.py)**: Register-level SPI driver for the Ai-Thinker `Ra-02` (`Semtech SX1278`) 433 MHz LoRa transceiver.
-- **[`firmware/ground_station.py`](firmware/ground_station.py)**: Ground-station receiver script that listens continuously at `433.0 MHz`, appends `RSSI` and `SNR` to each received CSV frame, and streams over USB serial.
+All MicroPython flight and ground-station software resides in [`firmware/`](./firmware/):
+- **[`firmware/main.py`](./firmware/main.py)**: Implements the 5-state flight state machine (`0: SELF_TEST`, `1: PAD`, `2: BOOST`, `3: DESCENT`, `4: LANDED`), the 5-second pre-launch RAM ring buffer, the $22.0 \pm 1.0\text{ }^\circ\text{C}$ Chamber A PID controller (with $<3.50\text{ V}$ and $\ge 30.0\text{ }^\circ\text{C}$ safety cut-outs), pre-touchdown leg release in `DESCENT` at $<150\text{ m}$ above pad or $\ge 15\text{ s}$ post-apogee, full-rate flash CSV logging (`flight_log.csv`), and $1\text{ Hz}$ binary LoRa transmission at $433.175\text{ MHz}$ (`SF8, BW125, CR4/5`).
+- **[`firmware/sensors.py`](./firmware/sensors.py)**: Hardware drivers for `BMP280` (`SPI1`), `ADXL375` $\pm 200\text{ g}$ (`SPI1`), dual `TSL2591` (`I2C0` & `I2C1`), Steinhart-Hart $10\text{ k}\Omega$ NTC thermistors (`ADC1`, `ADC2`), and battery voltage divider (`ADC0`).
+- **[`firmware/sx1278.py`](./firmware/sx1278.py)**: `SPI0` register-level driver for the `Ai-Thinker Ra-02` (`Semtech SX1278`) configured for $433.175\text{ MHz}$, `SF8`, `BW 125 kHz`, `CR 4/5`, `+17 dBm`.
+- **[`firmware/ground_station.py`](./firmware/ground_station.py)**: Ground receiver that unpacks the 34-byte binary frame, verifies its 16-bit `CRC-CCITT` checksum (skipping corrupted frames without crashing per Test `T7`), writes two redundant CSV logs (`ground_log_primary.csv` and `ground_log_backup.csv`), and streams live telemetry over USB serial.
 
-### Flashing the Board
-1. Bridge **`J2` (`BOOTSEL`)** with a jumper while connecting **`J4` (USB)** to a computer (or toggle **`J5` (`RUN`)** while `J2` is shorted).
-2. The RP2040 mounts as `RPI-RP2` USB Mass Storage. Copy the latest **MicroPython UF2 for RP2040** onto the drive.
-3. Upload `firmware/sensors.py`, `firmware/sx1278.py`, and `firmware/main.py` using `mpremote` or Thonny:
-   ```bash
-   mpremote cp firmware/sensors.py :sensors.py
-   mpremote cp firmware/sx1278.py :sx1278.py
-   mpremote cp firmware/main.py :main.py
-   mpremote reset
-   ```
+### 34-Byte Little-Endian Binary Telemetry Packet Specification (PDR Appendix D)
+
+Packed with `struct.pack("<HBIIhhhIIHHHBH", ...)` ($34\text{ bytes}$ total, $\sim 120\text{ ms}$ airtime at `SF8 / BW125 / CR4/5`):
+
+| Byte Offset | Field Name | C / Python Type | Size | Units / Scaling & Description |
+| :---: | :--- | :---: | :---: | :--- |
+| `0..1` | `pkt_num` | `uint16` (`H`) | 2 B | Monotonic packet sequence counter (`0..65535`) |
+| `2` | `state` | `uint8` (`B`) | 1 B | Flight state: `0=SELF_TEST, 1=PAD, 2=BOOST, 3=DESCENT, 4=LANDED` |
+| `3..6` | `mission_time_ms` | `uint32` (`I`) | 4 B | Milliseconds elapsed since boot |
+| `7..10` | `pressure_pa` | `uint32` (`I`) | 4 B | Barometric pressure from `BMP280` in $\text{Pa}$ |
+| `11..12` | `air_temp_c_x100` | `int16` (`h`) | 2 B | External air temperature from `BMP280` in $0.01\text{ }^\circ\text{C}$ |
+| `13..14` | `chamber_a_temp_x100` | `int16` (`h`) | 2 B | Heated Chamber A temperature (`TH1`) in $0.01\text{ }^\circ\text{C}$ |
+| `15..16` | `chamber_b_temp_x100` | `int16` (`h`) | 2 B | Unheated Control Chamber B temperature (`TH2`) in $0.01\text{ }^\circ\text{C}$ |
+| `17..20` | `light_a` | `uint32` (`I`) | 4 B | Chamber A `TSL2591` (`U7`) visible bioluminescence counts |
+| `21..24` | `light_b` | `uint32` (`I`) | 4 B | Chamber B `TSL2591` (`U8`) visible bioluminescence counts |
+| `25..26` | `peak_accel_g_x10` | `uint16` (`H`) | 2 B | Peak acceleration magnitude $|a|$ over $1\text{ s}$ window in $0.1\text{ g}$ |
+| `27..28` | `rms_jerk_gps` | `uint16` (`H`) | 2 B | RMS mechanical jerk $|\text{d}a/\text{d}t|$ over $1\text{ s}$ window in $\text{g/s}$ |
+| `29..30` | `battery_mv` | `uint16` (`H`) | 2 B | LiPo battery voltage (`VBAT`) in $\text{mV}$ |
+| `31` | `heater_duty_pct` | `uint8` (`B`) | 1 B | Chamber A PWM heater duty cycle (`0–100 %`) |
+| `32..33` | `crc16` | `uint16` (`H`) | 2 B | `CRC-16-CCITT` (`poly=0x1021, init=0xFFFF`) over bytes `0..31` |
 
 ---
 
-## 5. Repository Structure & Manufacturing Files
+## 6. Verification & Test Plan Summary (T1–T10, PDR Section 5)
+
+| Test ID | Verification Test | Method & Acceptance Target | Status / Design Verification |
+| :---: | :--- | :--- | :--- |
+| **T1** | **Mass, Dimensions & Fit Check** | Measure OD/height in launch tube simulator and weigh on $0.1\text{ g}$ balance. Target: $\text{OD} \le 64.5\text{ mm}$, $H \le 110\text{ mm}$, mass $300\text{–}330\text{ g}$ ($312\text{ g}$ nominal with $62\text{ g}$ ballast). | $52.0\text{ mm}$ round PCB fits inside $64\text{ mm}$ shell with $2.5\text{ mm}$ M3 tie-rod clearance (`MECH_KEEPOUT`). |
+| **T2** | **Parachute Deployment Shock Load** | Hang $5.2\text{ kg}$ static load ($>150\text{ N}$ shock equivalent) from top eyebolt and swivel (`35–43 kg` barrel swivel) for $60\text{ s}$. Target: zero structural cracking or thread pull-out. | Load path goes directly through the 3 stainless M3 tie-rods, bypassing the PETG shell walls and PCB. |
+| **T3** | **Descent Rate & Balcony Drop** | Drop weighted $312\text{ g}$ prototype with $38\text{ cm}$ octo-annular ripstop canopy from $10\text{ m}$. Target: steady descent $8.0\text{–}9.2\text{ m/s}$ ($8.6\text{ m/s}$ nominal). | Sized in PDR Section 3; verified by `BMP280` $\text{d}h/\text{d}t$ logging. |
+| **T4** | **Cold-Soak Battery & Heater Endurance** | Run complete avionics + Chamber A heater + $1\text{ Hz}$ LoRa inside $4\text{ }^\circ\text{C}$ fridge for $2.5\text{ hours}$. Target: Chamber A holds $22.0 \pm 1.0\text{ }^\circ\text{C}$ for $\ge 90\text{ min}$; `VBAT` stays $>3.50\text{ V}$. | `103450` $2000\text{ mAh}$ pouch cell provides $>2.4\times$ margin over the $820\text{ mAh}$ mission budget. |
+| **T5** | **Dark-Chamber Light-Tightness** | Place `TSL2591` inside sealed Chambers A & B under $50{,}000\text{ lux}$ floodlight (`GAIN_MAX = 9876x`). Target: baseline reading $< 5\text{ counts}$ with zero light leakage. | Labyrinth O-ring cap and black PETG walls block external light. |
+| **T6** | **Vortex-Shaker Bioluminescence Curve** | Stimulate dark-adapted *Pyrocystis* vials during the nocturnal phase of their $12:12$ cycle at graded RPMs while logging `ADXL375` jerk and `TSL2591` counts. | Confirms positive correlation between RMS jerk ($\text{g/s}$) and flash intensity, and higher output at $22\text{ }^\circ\text{C}$ vs. cold control. |
+| **T7** | **LoRa Range & Corrupted-Packet Fuzzing** | Line-of-sight range walk to $\ge 1.2\text{ km}$ at $433.175\text{ MHz}$ (`SF8`), plus injection of truncated/bit-flipped frames into `ground_station.py`. Target: $>95\%$ packet reception; zero parser crashes. | `decode_telemetry_frame()` validates length ($34\text{ B}$) and `CRC-16-CCITT` before logging. |
+| **T8** | **Two-Point Sensor Calibration** | Calibrate `TH1`, `TH2`, and `BMP280` against a reference thermometer ($0\text{ }^\circ\text{C}$ ice bath to $35\text{ }^\circ\text{C}$ water bath) and check `ADXL375` $\pm 1\text{ g}$ six-face inversions. | Steinhart-Hart coefficients and baseline pressure `alt_0` stored in [`firmware/sensors.py`](./firmware/sensors.py). |
+| **T9** | **Brownout & Reboot State Recovery** | Interrupt battery power for $50\text{ ms}$ and $2\text{ s}$ during simulated `DESCENT`. Target: `RP2040` reboots cleanly, appends to `flight_log.csv` without overwriting prior data. | `open("flight_log.csv", "a")` with periodic `flush()` every 5 packets. |
+| **T10** | **End-to-End Vacuum-Jar Flight Simulation** | Place CanSat in sealed vacuum chamber, pump down to simulate ascent $>25\text{ m}$ (`BOOST`), vent past apogee (`DESCENT`), and verify pre-touchdown leg release. | Servo fires in `DESCENT` at $<150\text{ m}$ or $15\text{ s}$ post-apogee; locked out in `SELF_TEST`, `PAD`, and `BOOST`. |
+
+---
+
+## 7. Complete Verified Bill of Materials (`£154.10` Total inc. VAT & Delivery)
+
+The authoritative BOM is tracked in [`bom.csv`](./bom.csv), [`CanSat_schematic_to_BOM_map.csv`](./CanSat_schematic_to_BOM_map.csv), and [`CanSat_BOM_verified_direct_links_2 (1).xlsx`](./CanSat_BOM_verified_direct_links_2%20(1).xlsx), split across 5 orders:
+- **Order 1 — JLCPCB PCB + Top-Side SMT Assembly ([`production/bom_jlcpcb.csv`](./production/bom_jlcpcb.csv))**: 14 unique SMT lines (**46 placed parts**, **157 SMT joints/board**, 2 assembled boards, 5 bare 4-layer boards) = **£40.41** (inc. 20% VAT & shipping).
+- **Order 2 — LCSC Hand-Fit Basket**: `U5` (`Ra-02`), `U3` (`MCP1700-3302E/TO`), `C22` ($100\text{ }\mu\text{F}$), `J1` (`JST-PH`), `SW1` (`SS-12D00G3`), `R8` ($15\text{ }\Omega$ $2\text{ W}$ axial heater), and $433\text{ MHz}$ helical antenna = **£22.09** (inc. 20% VAT & shipping).
+- **Order 3 — UK / Overseas Modules & Mechanical Hardware**: `U4` (`Adafruit ADXL375`), `U6` (`GY-BMP280-3.3`), `U7`/`U8` (`2x TSL2591`), `TH1`/`TH2` (`2x 10k NTC`), `103450` $2000\text{ mAh}$ LiPo pouch cell, `TP4056` charger, `MG90S` servo, ripstop nylon, barrel swivels, M3 stainless tie-rods, lifting eyebolt, and U.FL pigtail = **£52.59** (inc. VAT & delivery).
+- **Order 4 — Biology (Darwin Biological UK)**: *Pyrocystis* starter culture, Marine Algae Growth Medium vial, tracked courier delivery, and VAT = **£39.00** (inc. 20% VAT; £32.50 ex VAT if reclaimed via school finance).
+- **Order 5 — School Lab & Workshop Stock**: Sterile seawater base, $12:12$ light timer, vials, PETG/TPU 3D-printing filament (including the 3D-printed legs), scrap steel ballast, M3 Nyloc nuts, USB lead, and 550 paracord = **£0.00**.
+
+### Order 1: JLCPCB Factory-Assembled SMT Parts ([`production/bom_jlcpcb.csv`](./production/bom_jlcpcb.csv))
+
+| Designators | Qty/Board | Value / Spec | Package | LCSC Code | PCBA Type |
+| :--- | :---: | :--- | :--- | :---: | :---: |
+| `U1` | 1 | `RP2040` Dual Cortex-M0+ MCU | `QFN-56-1EP_7x7mm_P0.4mm_EP3.2x3.2mm` | `C2040` | Extended |
+| `U2` | 1 | `W25Q128JVSIQ` $16\text{ MB}$ QSPI Flash | `SOIC-8_5.3x5.3mm_P1.27mm` | `C97521` | Basic |
+| `Y1` | 1 | `12MHz` $20\text{ pF}$ SMD Crystal (`X322512MSB4SI`) | `Crystal_SMD_3225-4Pin_3.2x2.5mm` | `C9002` | Basic |
+| `C10, C11` | 2 | `33pF` $50\text{ V}$ `C0G` Crystal Load Caps | `C_0402_1005Metric` | `C1562` | Basic |
+| `C1–C9, C14, C15, C18–C21, C23–C25` | 18 | `100nF` $16\text{ V}$ `X7R` Decoupling & Filter Caps | `C_0402_1005Metric` | `C1525` | Basic |
+| `C13, C16` | 2 | `1uF` $25\text{ V}$ `X5R` RP2040 Core/VREG Caps | `C_0402_1005Metric` | `C52923` | Basic |
+| `C12, C17` | 2 | `10uF` $10\text{ V}$ `X5R` LDO Bulk Caps | `C_0603_1608Metric` | `C19702` | Basic |
+| `Q1, Q2` | 2 | `AO3400A` $30\text{ V}$ $5.7\text{ A}$ N-MOSFET | `SOT-23` | `C20917` | Basic |
+| `D1` | 1 | Green Status LED (`KT-0805G`) | `LED_0805_2012Metric` | `C2297` | Basic |
+| `R1, R4, R12` | 3 | `1k` $\pm 1\%$ Resistor (Crystal, BOOTSEL, LED) | `R_0402_1005Metric` | `C11702` | Basic |
+| `R2, R3` | 2 | `22` $\Omega$ $\pm 1\%$ USB Series Termination | `R_0402_1005Metric` | `C25092` | Basic |
+| `R5, R6, R13, R14, R17` | 5 | `10k` $\pm 1\%$ Resistor (SS, RUN, NTCs, Servo Pull-Down) | `R_0402_1005Metric` | `C25744` | Basic |
+| `R7, R10` | 2 | `100` $\Omega$ $\pm 1\%$ MOSFET Gate Series | `R_0402_1005Metric` | `C25076` | Basic |
+| `R9, R11, R15, R16` | 4 | `100k` $\pm 1\%$ Gate Pull-Downs & `VBAT` Divider | `R_0402_1005Metric` | `C25741` | Basic |
+| *`R18, R19, R20, R21`* | *0 (DNP)* | *`4.7k` DNP (`Exclude from BOM & Pos` — pull-ups on `TSL2591` modules)* | *`R_0402_1005Metric`* | *`C25900`* | *DNP* |
+
+---
+
+## 8. Repository Structure
 
 ```text
-├── CanSat.kicad_pro              # KiCad 10 Project File
-├── CanSat.kicad_sch              # Complete Schematic Source
-├── CanSat.kicad_pcb              # 4-Layer Routed &DRC-Verified PCB Layout
-├── CanSat.kicad_dru              # Custom Design Rules (JLCPCB 4-Layer Constraints)
-├── gerbers.zip                   # Ready-to-order JLCPCB 4-Layer Gerber + Excellon Drill Archive
-├── schematic.pdf                 # Vector PDF Schematic Export
-├── bom.csv                       # Full Bill of Materials with Direct Supplier Links
-├── production/
-│   ├── gerbers.zip               # Manufacturing Gerber + Drill Archive
-│   ├── bom_jlcpcb.csv            # JLCPCB SMT Assembly BOM with LCSC Part Numbers
-│   └── positions_jlcpcb.csv      # JLCPCB Pick-and-Place Component Placement (CPL)
-├── firmware/
-│   ├── main.py                   # RP2040 Flight State Machine & Thermal PID Controller
-│   ├── sensors.py                # BMP280, ADXL375, TSL2591, and NTC Sensor Drivers
-│   ├── sx1278.py                 # Ai-Thinker Ra-02 (SX1278) 433 MHz LoRa Driver
-│   └── ground_station.py         # Ground Station Telemetry Receiver
-└── images/
-    ├── pcb_angled_3d.png         # 3D Angled Raytraced PCB Render
-    ├── pcb_top_3d.png            # 3D Top Raytraced PCB Render
-    ├── pcb_bottom_3d.png         # 3D Bottom Raytraced PCB Render
-    ├── pcb_layout.svg            # 2D PCB Vector Layout
-    └── CanSat.svg                # Schematic Vector Diagram
+CanSat/
+├── CanSat.kicad_pro                # KiCad 10 Project (strict DRC severities, min_via=0.45mm, HighCurrent netclass)
+├── CanSat.kicad_sch                # Complete Schematic (exclude flags & LCSC codes synchronized with PCB)
+├── CanSat.kicad_pcb                # 4-Layer 52.0 mm Round PCB Layout (0 DRC violations, 0 unconnected items)
+├── CanSat.kicad_dru                # Custom Design Rules (Rev 2: fanout, via>=0.45mm, HighCurrent>=0.6mm, USB skew)
+├── CanSat_Modules.pretty/          # Custom Footprint Library (Pad_2pad_GND_SIG, Pad_3pad_Servo, ADXL375, BMP280, TSL2591)
+├── DRC.rpt                         # Official KiCad DRC & Schematic Parity Report (0 errors, 0 warnings)
+├── ERC.rpt                         # Official KiCad ERC Report (0 errors)
+├── schematic.pdf                   # Exported Vector Schematic PDF
+├── bom.csv                         # Complete Verified Project BOM (Orders 1-5, £154.10 total inc. VAT & shipping)
+├── CanSat_schematic_to_BOM_map.csv # Authoritative Designator-to-BOM & Placement Map (72 schematic parts)
+├── CanSat_BOM_verified_direct_links_2 (1).xlsx # Verified Pricing & Direct Supplier Links Spreadsheet
+├── production/                     # Ready-to-Order JLCPCB Manufacturing Package
+│   ├── gerbers.zip                 # 4-Layer Gerber + Excellon Drill Archive (regenerated from final PCB)
+│   ├── bom_jlcpcb.csv              # JLCPCB SMT Assembly BOM (14 lines / 46 SMT parts / 157 joints only)
+│   └── positions_jlcpcb.csv        # JLCPCB SMT Pick-and-Place File (46 top-side SMT parts only)
+├── firmware/                       # RP2040 MicroPython Flight & Ground Station Software
+│   ├── main.py                     # 5-State Flight Loop, 22°C Heater PID, Pre-Touchdown Leg Release, 34B Binary Telemetry
+│   ├── sensors.py                  # Drivers for BMP280 (SPI1), ADXL375 (SPI1), Dual TSL2591 (I2C0/1), NTCs & VBAT
+│   ├── sx1278.py                   # Ai-Thinker Ra-02 (SX1278 433.175 MHz, SF8, BW125, CR4/5) LoRa Driver
+│   └── ground_station.py           # 34-Byte Binary + CRC16 Receiver & Redundant Dual-CSV Telemetry Logger
+├── reports/                        # Preliminary Design Review (PDR) & PCB Design Guide
+│   ├── LUSoM_Team_Verticality_PDR_updated_v2.pdf
+│   └── CanSat_PCB_Design_Guide__Team_Verticality__rev2.pdf
+├── images/                         # Raytraced 3D PCB Renders & Schematic Previews
+└── LICENSE                         # MIT License
 ```
-
----
-
-## 6. Bill of Materials (BOM)
-
-The full machine-readable BOM is also available in [`bom.csv`](bom.csv) and [`production/bom_jlcpcb.csv`](production/bom_jlcpcb.csv).
-
-| Reference | Qty | Component | Value / Specification | Footprint | Subsystem | Unit (EUR) | Total (EUR) | Direct Link |
-| :--- | :---: | :--- | :--- | :--- | :--- | :---: | :---: | :--- |
-| `U1` | 1 | Raspberry Pi RP2040 MCU | Dual-core Cortex-M0+ 133 MHz | `QFN-56-1EP` (7×7 mm) | OBC Core | €0.80 | €0.80 | [DigiKey](https://www.digikey.ie/en/products/detail/raspberry-pi/SC0914-13/14306009) |
-| `U2` | 1 | Winbond W25Q128JVSIQ | 16 MB (128 Mbit) QSPI NOR Flash | `SOIC-8` (5.23×5.23 mm) | OBC Core | €1.35 | €1.35 | [DigiKey](https://www.digikey.ie/en/products/detail/winbond-electronics/W25Q128JVSIQ/5803943) |
-| `Y1` | 1 | 12 MHz SMD Crystal | `ABM8-12.000MHZ-B2-T` (±20 ppm) | `SMD 3225-4Pin` | OBC Core | €0.45 | €0.45 | [DigiKey](https://www.digikey.ie/en/products/detail/abracon-llc/ABM8-12-000MHZ-B2-T/1237080) |
-| `U3` | 1 | MCP1700-3302E-TO | 3.3 V 250 mA Low-$I_Q$ LDO | `TO-92-3` | Power | €0.48 | €0.48 | [DigiKey](https://www.digikey.ie/en/products/detail/microchip-technology/MCP1700-3302E-TO/652677) |
-| `U5` | 1 | Ai-Thinker Ra-02 (SX1278) | 433 MHz SPI LoRa Transceiver | Castellated 16-Pin SMD | Comms | €3.50 | €3.50 | [AliExpress](https://www.aliexpress.com/w/wholesale-Ra-02-SX1278-433MHz.html) |
-| `U6` | 1 | BMP280 Barometer Module | Digital Barometric Pressure/Temp | 6-Pin 2.54 mm Header | Avionics | €1.80 | €1.80 | [AliExpress](https://www.aliexpress.com/w/wholesale-BMP280-3.3V-module.html) |
-| `U4` | 1 | ADXL375 High-G IMU Module | ±200g 3-Axis SPI Accelerometer | 8-Pin 2.54 mm Header | Avionics | €5.50 | €5.50 | [AliExpress](https://www.aliexpress.com/w/wholesale-ADXL375-module.html) |
-| `U7`, `U8` | 2 | TSL25911FN Light Sensor | High-Sensitivity Lux Sensor (I2C) | 6-Pin 2.54 mm Header | Bioluminescence | €4.00 | €8.00 | [AliExpress](https://www.aliexpress.com/w/wholesale-TSL2591-module.html) |
-| `TH1`, `TH2` | 2 | 10 kΩ NTC Thermistor Probe | Waterproof 10 kΩ 1% ($B=3950$) | 2-Pin 2.54 mm Header | Thermal Sense | €1.25 | €2.50 | [AliExpress](https://www.aliexpress.com/w/wholesale-10k-NTC-3950-probe.html) |
-| `R8` | 1 | 15 Ω 2W Power Resistor | 15 Ω 2W Flameproof Metal Oxide | Axial Through-Hole | Chamber A Heater | €0.35 | €0.35 | [DigiKey](https://www.digikey.ie/en/products/detail/stackpole-electronics-inc/RSF2JT15R0/1706233) |
-| `Q1`, `Q2` | 2 | AO3400A N-Ch MOSFET | 30 V 5.7 A Logic-Level MOSFET | `SOT-23-3` | Heater & Servo Switch | €0.25 | €0.50 | [DigiKey](https://www.digikey.ie/en/products/detail/alpha-omega-semiconductor-inc/AO3400A/1855773) |
-| `C22` | 1 | 100 µF Electrolytic Cap | 100 µF 16 V Radial Bulk Cap | Radial D5.0 mm P2.0 mm | Servo Bulk Cap | €0.20 | €0.20 | [DigiKey](https://www.digikey.ie/en/products/detail/nichicon/UVR1C101MDD/588816) |
-| `C1`–`C8`, `C11`, `C13`, `C14`, `C16`, `C18`, `C19`, `C21`, `C23`–`C25` | 18 | 100 nF Ceramic Capacitor | 100 nF 16 V X7R | `0402` | Decoupling & Filtering | €0.03 | €0.54 | [DigiKey](https://www.digikey.ie/en/products/detail/samsung-electro-mechanics/CL05B104KO5NNNC/3886661) |
-| `C12`, `C17` | 2 | 1 µF Ceramic Capacitor | 1 µF 16 V X5R | `0402` | LDO Stability | €0.05 | €0.10 | [DigiKey](https://www.digikey.ie/en/products/detail/samsung-electro-mechanics/CL05A105KO5NNNC/3886694) |
-| `C15`, `C20` | 2 | 10 µF Ceramic Capacitor | 10 µF 16 V X5R | `0805` | RP2040 & LoRa Bulk | €0.08 | €0.16 | [DigiKey](https://www.digikey.ie/en/products/detail/samsung-electro-mechanics/CL21A106KOQNNNE/3886729) |
-| `C9`, `C10` | 2 | 15 pF Ceramic Capacitor | 15 pF 50 V C0G/NP0 | `0402` | Crystal Load Caps | €0.03 | €0.06 | [DigiKey](https://www.digikey.ie/en/products/detail/yageo/CC0402JRNPO9BN150/302798) |
-| `R3`, `R4` | 2 | 27 Ω Resistor | 27 Ω 1% 1/16 W | `0402` | USB Series Term | €0.02 | €0.04 | [DigiKey](https://www.digikey.ie/en/products/detail/yageo/RC0402FR-0727RL/726546) |
-| `R7`, `R10` | 2 | 100 Ω Resistor | 100 Ω 1% 1/16 W | `0402` | MOSFET Gate Drive | €0.02 | €0.04 | [DigiKey](https://www.digikey.ie/en/products/detail/yageo/RC0402FR-07100RL/726513) |
-| `R5`, `R12` | 2 | 1 kΩ Resistor | 1 kΩ 1% 1/16 W | `0402` | XOUT & LED Limit | €0.02 | €0.04 | [DigiKey](https://www.digikey.ie/en/products/detail/yageo/RC0402FR-071KL/726518) |
-| `R18`–`R21` | 4 | 4.7 kΩ Resistor | 4.7 kΩ 1% 1/16 W | `0402` | I2C0 & I2C1 Pull-Ups | €0.02 | €0.08 | [DigiKey](https://www.digikey.ie/en/products/detail/yageo/RC0402FR-074K7L/726595) |
-| `R1`, `R2`, `R6`, `R13`, `R14` | 5 | 10 kΩ Resistor | 10 kΩ 1% 1/16 W | `0402` | Pull-Ups & NTC Bias | €0.02 | €0.10 | [DigiKey](https://www.digikey.ie/en/products/detail/yageo/RC0402FR-0710KL/726519) |
-| `R9`, `R11`, `R15`–`R17` | 5 | 100 kΩ Resistor | 100 kΩ 1% 1/16 W | `0402` | Gate Pull-Downs & VBAT | €0.02 | €0.10 | [DigiKey](https://www.digikey.ie/en/products/detail/yageo/RC0402FR-07100KL/726514) |
-| `D1` | 1 | Green SMD LED | 525 nm Status Indicator | `0603` | Status LED | €0.08 | €0.08 | [DigiKey](https://www.digikey.ie/en/products/detail/wurth-elektronik/150060GS75000/4489903) |
-| `J1` | 1 | JST-PH 2-Pin Header | 2.0 mm Vertical Battery Conn | `JST_PH_B2B-PH-K` | Battery Input | €0.20 | €0.20 | [DigiKey](https://www.digikey.ie/en/products/detail/jst-sales-america-inc/B2B-PH-K-S/926611) |
-| `SW1` | 1 | Slide Power Switch | Through-Hole SPDT Switch | `SW_CuK_JS202011CQN` | Master Power Switch | €0.45 | €0.45 | [DigiKey](https://www.digikey.ie/en/products/detail/c-k/JS202011CQN/1986399) |
-| `J2`–`J6` | 5 | 2.54 mm Pin Headers | BOOTSEL, SWD, USB, RUN, Servo | `PinHeader_1x02..04` | Debug & Servo I/O | €0.06 | €0.31 | [AliExpress](https://www.aliexpress.com/w/wholesale-2.54mm-pin-header.html) |
-| `MG90S` | 1 | MG90S Micro Servo | Metal-Gear Micro Servo (Off-Board) | Plugs into `J6` | Landing Leg Release | €2.20 | €2.20 | [AliExpress](https://www.aliexpress.com/w/wholesale-MG90S-metal-gear-servo.html) |
-| `BT1` | 1 | 18650 3.7V Li-Ion Cell | 2600 mAh Protected Cell + Holder | Plugs into `J1` | Primary Battery | €4.50 | €4.50 | [AliExpress](https://www.aliexpress.com/w/wholesale-18650-battery-holder-jst.html) |
-| `PCB` | 1 | 4-Layer Custom PCB | 45.0×42.0 mm 4-Layer FR4 | JLCPCB 4-Layer | Avionics & Payload PCB | €7.00 | €7.00 | [JLCPCB](https://jlcpcb.com/) |
-| **Total** | | | | | | | **€41.03** | |
