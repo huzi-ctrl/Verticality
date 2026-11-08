@@ -1,4 +1,4 @@
-Designator,Value (bom),Suggested footprint,LCSC / source,Who fits it,Note,Current schematic footprint
+Designator,Value (BOM),Suggested footprint,LCSC / source,Who fits it,Note,Current schematic footprint
 C1,100nF,Capacitor_SMD:C_0402_1005Metric,C1525,JLCPCB,,NONE
 C2,100nF,Capacitor_SMD:C_0402_1005Metric,C1525,JLCPCB,,NONE
 C3,100nF,Capacitor_SMD:C_0402_1005Metric,C1525,JLCPCB,,NONE
@@ -20,7 +20,7 @@ C18,100nF,Capacitor_SMD:C_0402_1005Metric,C1525,JLCPCB,,NONE
 C19,100nF,Capacitor_SMD:C_0402_1005Metric,C1525,JLCPCB,,NONE
 C20,100nF,Capacitor_SMD:C_0402_1005Metric,C1525,JLCPCB,,NONE
 C21,100nF,Capacitor_SMD:C_0402_1005Metric,C1525,JLCPCB,,NONE
-C22,100uF 16V,Capacitor_THT:CP_Radial_D5.0mm_P2.00mm,C43803,Hand-fit (LCSC),Exclude from bom and position files.,NONE
+C22,100uF 16V,Capacitor_THT:CP_Radial_D5.0mm_P2.00mm,C43803,Hand-fit (LCSC),Exclude from BOM and position files.,NONE
 C23,100nF,Capacitor_SMD:C_0402_1005Metric,C1525,JLCPCB,,NONE
 C24,100nF,Capacitor_SMD:C_0402_1005Metric,C1525,JLCPCB,,NONE
 C25,100nF,Capacitor_SMD:C_0402_1005Metric,C1525,JLCPCB,,NONE
@@ -34,13 +34,13 @@ J6,Servo,"NEW: 3-pad wire footprint (1 GND-switched, 2 VBAT, 3 SIG)",-,Pad only,
 Q1,AO3400A,Package_TO_SOT_SMD:SOT-23,C20917,JLCPCB,,Package_TO_SOT_SMD:SOT-23
 Q2,AO3400A,Package_TO_SOT_SMD:SOT-23,C20917,JLCPCB,,Package_TO_SOT_SMD:SOT-23
 R1,1k,Resistor_SMD:R_0402_1005Metric,C11702,JLCPCB,,NONE
-R2,22 (schematic says 27),Resistor_SMD:R_0402_1005Metric,C25092,JLCPCB,Schematic value 27 does not match bom C25092 (22 ohm). Decide one.,NONE
-R3,22 (schematic says 27),Resistor_SMD:R_0402_1005Metric,C25092,JLCPCB,Schematic value 27 does not match bom C25092 (22 ohm). Decide one.,NONE
+R2,22 (schematic says 27),Resistor_SMD:R_0402_1005Metric,C25092,JLCPCB,Schematic value 27 does not match BOM C25092 (22 ohm). Decide one.,NONE
+R3,22 (schematic says 27),Resistor_SMD:R_0402_1005Metric,C25092,JLCPCB,Schematic value 27 does not match BOM C25092 (22 ohm). Decide one.,NONE
 R4,1k,Resistor_SMD:R_0402_1005Metric,C11702,JLCPCB,,NONE
 R5,10k,Resistor_SMD:R_0402_1005Metric,C25744,JLCPCB,,NONE
 R6,10k,Resistor_SMD:R_0402_1005Metric,C25744,JLCPCB,,NONE
 R7,100,Resistor_SMD:R_0402_1005Metric,C25076,JLCPCB,,NONE
-R8,15R 2W axial,"(2 wire pads, no part on board)",C176558,Hand-fit (LCSC),Heater is off-board against the chamber block. Needs 2-pad footprint; exclude from bom and position files.,NONE
+R8,15R 2W axial,"(2 wire pads, no part on board)",C176558,Hand-fit (LCSC),Heater is off-board against the chamber block. Needs 2-pad footprint; exclude from BOM and position files.,NONE
 R9,100k,Resistor_SMD:R_0402_1005Metric,C25741,JLCPCB,,NONE
 R10,100,Resistor_SMD:R_0402_1005Metric,C25076,JLCPCB,,NONE
 R11,100k,Resistor_SMD:R_0402_1005Metric,C25741,JLCPCB,,NONE
@@ -50,10 +50,10 @@ R14,10k,Resistor_SMD:R_0402_1005Metric,C25744,JLCPCB,,NONE
 R15,100k,Resistor_SMD:R_0402_1005Metric,C25741,JLCPCB,,NONE
 R16,100k,Resistor_SMD:R_0402_1005Metric,C25741,JLCPCB,,NONE
 R17,10k,Resistor_SMD:R_0402_1005Metric,C25744,JLCPCB,,NONE
-R18,4.7k DNP,Resistor_SMD:R_0402_1005Metric,C25900,DNP (not ordered),"Set DNP + exclude from bom and position files, or JLCPCB bom will list them.",NONE
-R19,4.7k DNP,Resistor_SMD:R_0402_1005Metric,C25900,DNP (not ordered),"Set DNP + exclude from bom and position files, or JLCPCB bom will list them.",NONE
-R20,4.7k DNP,Resistor_SMD:R_0402_1005Metric,C25900,DNP (not ordered),"Set DNP + exclude from bom and position files, or JLCPCB bom will list them.",NONE
-R21,4.7k DNP,Resistor_SMD:R_0402_1005Metric,C25900,DNP (not ordered),"Set DNP + exclude from bom and position files, or JLCPCB bom will list them.",NONE
+R18,4.7k DNP,Resistor_SMD:R_0402_1005Metric,C25900,DNP (not ordered),"Set DNP + exclude from BOM and position files, or JLCPCB BOM will list them.",NONE
+R19,4.7k DNP,Resistor_SMD:R_0402_1005Metric,C25900,DNP (not ordered),"Set DNP + exclude from BOM and position files, or JLCPCB BOM will list them.",NONE
+R20,4.7k DNP,Resistor_SMD:R_0402_1005Metric,C25900,DNP (not ordered),"Set DNP + exclude from BOM and position files, or JLCPCB BOM will list them.",NONE
+R21,4.7k DNP,Resistor_SMD:R_0402_1005Metric,C25900,DNP (not ordered),"Set DNP + exclude from BOM and position files, or JLCPCB BOM will list them.",NONE
 SW1,SS-12D00G3,"(draw/import: 3-pin slide switch, check pitch)",C22355741,Hand-fit (LCSC),Symbol pin 2 is the common (battery side). Footprint pad 2 must be the middle pin.,NONE
 TH1,NTC 10k,NEW: 2-pad wire footprint,(eBay pack of 2),Hand-wired,,NONE
 TH2,NTC 10k,NEW: 2-pad wire footprint,(eBay pack of 2),Hand-wired,,NONE
@@ -64,9 +64,9 @@ TP4,RX net (GP0),TestPoint:TestPoint_Pad_D1.5mm,-,Pad only,"GP0 is UART0 TX, so 
 TP5,TX net (GP1),TestPoint:TestPoint_Pad_D1.5mm,-,Pad only,"GP0 is UART0 TX, so the pad named RX is the MCU transmit pin. Fine if named from the adapter side.",NONE
 U1,RP2040,Package_DFN_QFN:QFN-56-1EP_7x7mm_P0.4mm_EP3.2x3.2mm,C2040,JLCPCB,,Package_DFN_QFN:QFN-56-1EP_7x7mm_P0.4mm_EP3.2x3.2mm
 U2,W25Q128JVSIQ,Package_SO:SOIC-8_5.3x5.3mm_P1.27mm,C97521,JLCPCB,Confirm PCBA type on JLCPCB page.,Package_SO:SOIC-8_5.3x5.3mm_P1.27mm
-U3,MCP1700-3302E/TO,Package_TO_SOT_THT:TO-92_Inline,C511277,Hand-fit (LCSC),Exclude from bom and position files.,Package_TO_SOT_THT:TO-92_Inline
-U4,ADXL375 module,"NEW: 7-pad wire footprint (3V3,GND,SCL,SDA,SDO,CS,INT1)","(module, eBay)",Hand-wired,Currently a bare LGA-14 chip symbol with LCSC C579466. bom option 1 says C481898.,C579466:LGA-14_L5.0-W3.0-P0.80-BL-1
-U5,Ra-02,RF_Module:Ai-Thinker-Ra-01-LoRa,C90039,Hand-fit (LCSC),Exclude from bom and position files. Pinout matches Ai-Thinker datasheet.,RF_Module:Ai-Thinker-Ra-01-LoRa
+U3,MCP1700-3302E/TO,Package_TO_SOT_THT:TO-92_Inline,C511277,Hand-fit (LCSC),Exclude from BOM and position files.,Package_TO_SOT_THT:TO-92_Inline
+U4,ADXL375 module,"NEW: 7-pad wire footprint (3V3,GND,SCL,SDA,SDO,CS,INT1)","(module, eBay)",Hand-wired,Currently a bare LGA-14 chip symbol with LCSC C579466. BOM option 1 says C481898.,C579466:LGA-14_L5.0-W3.0-P0.80-BL-1
+U5,Ra-02,RF_Module:Ai-Thinker-Ra-01-LoRa,C90039,Hand-fit (LCSC),Exclude from BOM and position files. Pinout matches Ai-Thinker datasheet.,RF_Module:Ai-Thinker-Ra-01-LoRa
 U6,GY-BMP280-3.3 module,"NEW: 6-pad wire footprint (3V3,GND,SCK,SDI,SDO,CSB)","(module, eBay)",Hand-wired,"Currently a bare LGA-8 chip symbol, wired as SPI. Handover said 4 pads / I2C.",Package_LGA:Bosch_LGA-8_2x2.5mm_P0.65mm_ClockwisePinNumbering
 U7,TSL2591 module A,"TSL2591_module_5pad (custom) with a 1x05 symbol: 1 3V3, 2 GND, 3 SDA, 4 SCL, 5 INT","(module, AliExpress)",Hand-wired,Currently a bare TSL25911FN DFN-6 chip symbol; pin numbers do not match the custom footprint.,OptoDevice:AMS_TSL25911FN
 U8,TSL2591 module B,"TSL2591_module_5pad (custom) with a 1x05 symbol: 1 3V3, 2 GND, 3 SDA, 4 SCL, 5 INT","(module, AliExpress)",Hand-wired,Currently a bare TSL25911FN DFN-6 chip symbol; pin numbers do not match the custom footprint.,OptoDevice:AMS_TSL25911FN
