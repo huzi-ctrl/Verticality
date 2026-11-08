@@ -221,6 +221,7 @@ CanSat/
 ├── ERC.rpt                         # Official KiCad ERC Report (0 errors)
 ├── schematic.pdf                   # Exported Vector Schematic PDF
 ├── BOM.csv                         # Complete Verified Project bom for Hack Club ($199.53 USD total / £154.10 inc. tax & shipping)
+├── TEACHER_REQUISITION.md          # Clean School Teacher Requisition (Darwin Biological & £20-30 Order)
 ├── CanSat_schematic_to_parts_map.csv # Authoritative Designator-to-parts & Placement Map (72 schematic parts)
 ├── CanSat_parts_verified_direct_links.xlsx # Verified Pricing & Direct Supplier Links Spreadsheet
 ├── production/                     # Ready-to-Order JLCPCB Manufacturing Package
