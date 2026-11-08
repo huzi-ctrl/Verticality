@@ -1,9 +1,169 @@
-ERC report (2026-11-08T19:30:49, Encoding UTF8)
-Report includes: Errors
+ERC report (2026-11-08T20:18:27, Encoding UTF8)
+Report includes: Errors, Warnings
 
 ***** Sheet /
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(68.58 mm, 17.78 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(73.66 mm, 22.86 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 33.02 mm): Horizontal Wire, length 8.89 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 35.56 mm): Horizontal Wire, length 8.89 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 38.10 mm): Horizontal Wire, length 8.89 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 40.64 mm): Horizontal Wire, length 8.89 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 43.18 mm): Horizontal Wire, length 8.89 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 45.72 mm): Horizontal Wire, length 8.89 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 48.26 mm): Horizontal Wire, length 8.89 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 50.80 mm): Horizontal Wire, length 8.89 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 53.34 mm): Horizontal Wire, length 8.89 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 55.88 mm): Horizontal Wire, length 8.89 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 58.42 mm): Horizontal Wire, length 8.89 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 60.96 mm): Horizontal Wire, length 8.89 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 63.50 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 66.04 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 68.58 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 71.12 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 73.66 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 76.20 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 78.74 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 81.28 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 83.82 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 86.36 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 88.90 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 96.52 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 104.14 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 106.68 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(86.36 mm, 101.60 mm): Horizontal Wire, length 11.43 mm
+[pin_to_pin]: Pins of type Unspecified and Power input are connected
+    ; warning
+    @(134.62 mm, 24.13 mm): Symbol U4 Pin 1 [VDDI/O, Unspecified, Line]
+    @(123.19 mm, 20.32 mm): Symbol #PWR029 Pin 1 [Power input, Line]
+[pin_to_pin]: Pins of type Unspecified and Unspecified are connected
+    ; warning
+    @(134.62 mm, 26.67 mm): Symbol U4 Pin 2 [GND, Unspecified, Line]
+    @(134.62 mm, 31.75 mm): Symbol U4 Pin 4 [GND, Unspecified, Line]
+[pin_to_pin]: Pins of type Unspecified and Unspecified are connected
+    ; warning
+    @(134.62 mm, 31.75 mm): Symbol U4 Pin 4 [GND, Unspecified, Line]
+    @(134.62 mm, 34.29 mm): Symbol U4 Pin 5 [GND, Unspecified, Line]
+[pin_to_pin]: Pins of type Unspecified and Power input are connected
+    ; warning
+    @(134.62 mm, 34.29 mm): Symbol U4 Pin 5 [GND, Unspecified, Line]
+    @(123.19 mm, 39.37 mm): Symbol #PWR028 Pin 1 [Power input, Line]
+[pin_to_pin]: Pins of type Unspecified and Power input are connected
+    ; warning
+    @(134.62 mm, 36.83 mm): Symbol U4 Pin 6 [VS, Unspecified, Line]
+    @(123.19 mm, 20.32 mm): Symbol #PWR029 Pin 1 [Power input, Line]
+[pin_to_pin]: Pins of type Unspecified and Bidirectional are connected
+    ; warning
+    @(134.62 mm, 39.37 mm): Symbol U4 Pin 7 [~{CS}, Unspecified, Line]
+    @(86.36 mm, 66.04 mm): Symbol U1 Pin 16 [GPIO13, Bidirectional, Line]
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(135.89 mm, 113.03 mm): Horizontal Wire, length 7.62 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(135.89 mm, 118.11 mm): Horizontal Wire, length 7.62 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(172.72 mm, 123.19 mm): Vertical Wire, length 1.27 mm
+[pin_to_pin]: Pins of type Unspecified and Input are connected
+    ; warning
+    @(180.34 mm, 24.13 mm): Symbol U4 Pin 14 [SCL/SCLK, Unspecified, Line]
+    @(259.08 mm, 87.63 mm): Symbol U6 Pin 4 [SCK, Input, Line]
+[pin_to_pin]: Pins of type Unspecified and Bidirectional are connected
+    ; warning
+    @(180.34 mm, 26.67 mm): Symbol U4 Pin 13 [SDA/SDI/SDIO, Unspecified, Line]
+    @(259.08 mm, 90.17 mm): Symbol U6 Pin 3 [SDI, Bidirectional, Line]
+[pin_to_pin]: Pins of type Unspecified and Bidirectional are connected
+    ; warning
+    @(180.34 mm, 29.21 mm): Symbol U4 Pin 12 [SDO/ALTADDRESS, Unspecified, Line]
+    @(86.36 mm, 63.50 mm): Symbol U1 Pin 15 [GPIO12, Bidirectional, Line]
+[pin_to_pin]: Pins of type Unspecified and Bidirectional are connected
+    ; warning
+    @(180.34 mm, 39.37 mm): Symbol U4 Pin 8 [INT1, Unspecified, Line]
+    @(86.36 mm, 88.90 mm): Symbol U1 Pin 34 [GPIO22, Bidirectional, Line]
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(173.99 mm, 60.96 mm): Horizontal Wire, length 11.43 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(185.42 mm, 113.03 mm): Horizontal Wire, length 1.27 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(180.34 mm, 118.11 mm): Horizontal Wire, length 6.35 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(180.34 mm, 39.37 mm): Horizontal Wire, length 8.89 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(180.34 mm, 24.13 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(180.34 mm, 26.67 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(180.34 mm, 29.21 mm): Horizontal Wire, length 10.16 mm
+[unconnected_wire_endpoint]: Unconnected wire endpoint
+    ; warning
+    @(223.52 mm, 73.66 mm): Horizontal Wire, length 8.89 mm
 
- ** ERC messages: 0  Errors 0  Warnings 0
+ ** ERC messages: 50  Errors 0  Warnings 50
 
  ** Ignored checks:
     - Global label only appears once in the schematic
