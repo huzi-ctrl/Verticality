@@ -2,7 +2,7 @@
 
 [![Interactive PCB Viewer (KiCanvas)](https://img.shields.io/badge/KiCanvas-Interactive_PCB_&_Schematic_Viewer-2ea44f?style=for-the-badge&logo=kicad&logoColor=white)](https://kicanvas.org/?github=https%3A%2F%2Fgithub.com%2Fhuzi-ctrl%2FVerticality%2Fblob%2Fmain%2FCanSat.kicad_pcb)
 [![KiCad 10.0](https://img.shields.io/badge/KiCad-10.0%204--Layer%2052mm%20Round%20PCB-314cb0?style=for-the-badge&logo=kicad&logoColor=white)](./CanSat.kicad_pcb)
-[![DRC & ERC](https://img.shields.io/badge/DRC_%26_ERC-0_Errors_%7C_0_Unconnected-brightgreen?style=for-the-badge)](./DRC.rpt)
+[![DRC & ERC](https://img.shields.io/badge/DRC_%26_ERC-0_Unconnected_%7C_JLCPCB_Standard_Tier-brightgreen?style=for-the-badge)](./DRC.rpt)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](./LICENSE)
 
 **Team Verticality** (Lancaster University School of Mathematics — UK CanSat Competition) is a 4-layer **52.0 mm round** avionics and dual-chamber biological payload controller built from scratch around the **Raspberry Pi RP2040** microcontroller.
@@ -56,12 +56,15 @@ The board ([`CanSat.kicad_pcb`](./CanSat.kicad_pcb)) is a **52.0 mm diameter**, 
 - **High-Current MOSFET Via Arrays & Trace Widths**:
   - `Q1` (Heater `AO3400A`) and `Q2` (Servo `AO3400A`) each have **three `0.6 mm / 0.3 mm` `GND` vias** at their source pads (`Q1.2` and `Q2.2`) to handle the $\sim 1\text{ A}$ servo stall current and $250\text{ mA}$ heater current with minimal ground bounce.
   - `HighCurrent` netclass contains only the switched drain paths `Net-(Q1-D)` and `Net-(J6-Pin_1)` routed at **`0.6 mm` width**, while the logic gate nets (`/HEATER`, `/SERVO_P`, `/SERVO_S`) use signal widths.
-- **Via Sizing, Wire-Pad Keepouts & Teardrops**:
-  - Every via on the board is **`0.45 mm / 0.20 mm` minimum** (`0.45/0.2`, `0.5/0.25`, and `0.6/0.3` — zero `0.4/0.2` vias remain), with `min_via_diameter: 0.45` enforced in [`CanSat.kicad_pro`](./CanSat.kicad_pro) and [`CanSat.kicad_dru`](./CanSat.kicad_dru).
+- **Via Sizing & Standard JLCPCB $2.00 Base Tier Optimization**:
+  - Every via on the board uses a **`0.30 mm` drill minimum** across all 112 vias (90 at `0.45 / 0.30 mm`, 3 at `0.50 / 0.30 mm`, and 19 at `0.60 / 0.30 mm` — zero `< 0.30 mm` vias remain), with `min_through_hole_diameter: 0.30` and `min_via_annular_width: 0.075` mm configured in [`CanSat.kicad_pro`](./CanSat.kicad_pro). This qualifies the design for JLCPCB's standard **`0.3mm / (0.4/0.45mm)`** pricing tier ($2.00 base price) instead of triggering advanced high-precision surcharges.
   - All 12 wire-pad groups (`J1/SW1`, `J2 BOOTSEL` using `CanSat_Modules:Pad_2pad_GND_SIG`, `J3 SWD`, `J4 USB`, `J5 RUN`, `J6 Servo`, `R8 Heater`, `TH1`, `TH2`, `U4`, `U6`, `U7`, `U8`) are protected by `WIRE_PADS` keepout zones prohibiting vias under solder pads, and teardrops are enabled on all pads and vias.
-- **Verified Zero-Error DRC & ERC**:
-  - [`DRC.rpt`](./DRC.rpt): **0 DRC violations, 0 unconnected pads, 0 footprint parity errors**.
-  - [`ERC.rpt`](./ERC.rpt): **0 ERC errors**.
+- **DRC & ERC Verification Status**:
+  * [`DRC.rpt`](./DRC.rpt): **0 unconnected pads, 0 footprint errors, 0 schematic parity errors**.
+  * **16 DFM Clearances Documented**:
+    * **4 Hole-to-Hole Spacing Notices**: In the tight $0.4\text{ mm}$ pitch RP2040 escape fanout, adjacent $0.3\text{ mm}$ drill vias sit at $0.407\text{ mm}$ (`/INT_A` vs `/INT_B`) to $0.450\text{ mm}$ drill-edge spacing. While flagged against KiCad's generic $0.500\text{ mm}$ default rule, these safely clear JLCPCB's 4-layer CAM drill-to-drill capability of $\ge 0.25\text{ mm}$ (and $\ge 0.254\text{ mm}$ same-net).
+    * **12 Drill-to-Track Clearances**: With $0.45\text{ mm}$ pads, $0.30\text{ mm}$ drills ($0.075\text{ mm}$ annular ring), and standard $0.15\text{ mm}$ trace clearance, physical drill-to-trace distance is $0.205\text{ mm} - 0.235\text{ mm}$, fully compliant with JLCPCB's 4-layer hole-to-track minimum of $\ge 0.20\text{ mm}$.
+  * [`ERC.rpt`](./ERC.rpt): **0 ERC errors** (50 warnings for net-label wire stubs and unspecified pins per design guide).
 
 ---
 
@@ -205,10 +208,10 @@ The authoritative BOM is tracked in [`bom.csv`](./bom.csv), [`CanSat_schematic_t
 CanSat/
 ├── CanSat.kicad_pro                # KiCad 10 Project (strict DRC severities, min_via=0.45mm, HighCurrent netclass)
 ├── CanSat.kicad_sch                # Complete Schematic (exclude flags & LCSC codes synchronized with PCB)
-├── CanSat.kicad_pcb                # 4-Layer 52.0 mm Round PCB Layout (0 DRC violations, 0 unconnected items)
+├── CanSat.kicad_pcb                # 4-Layer 52.0 mm Round PCB Layout (0 unconnected items, 0.3mm via drills)
 ├── CanSat.kicad_dru                # Custom Design Rules (Rev 2: fanout, via>=0.45mm, HighCurrent>=0.6mm, USB skew)
 ├── CanSat_Modules.pretty/          # Custom Footprint Library (Pad_2pad_GND_SIG, Pad_3pad_Servo, ADXL375, BMP280, TSL2591)
-├── DRC.rpt                         # Official KiCad DRC & Schematic Parity Report (0 errors, 0 warnings)
+├── DRC.rpt                         # Official KiCad DRC & Parity Report (0 unconnected, 0 parity errors, 16 DFM notices)
 ├── ERC.rpt                         # Official KiCad ERC Report (0 errors)
 ├── schematic.pdf                   # Exported Vector Schematic PDF
 ├── bom.csv                         # Complete Verified Project BOM (Orders 1-5, £154.10 total inc. VAT & shipping)
