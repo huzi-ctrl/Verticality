@@ -1,44 +1,44 @@
-Part,Qty,Unit,Total,Vendor
-"RP2040 32-bit Dual ARM Cortex-M0+ MCU (QFN-56, JLCPCB C2040)",2,1.09,2.17,https://www.lcsc.com/product-detail/C2040.html
-"Winbond W25Q128JVSIQ 16MB QSPI NOR Flash (SOIC-8, JLCPCB C97521)",2,2.33,4.65,https://www.lcsc.com/product-detail/C97521.html
-"YXC 12MHz 20pF SMD Crystal (3225 4-pin, JLCPCB C9002)",2,0.1,0.19,https://www.lcsc.com/product-detail/C9002.html
-"33pF 50V C0G Crystal Load Capacitors (0402, JLCPCB C1562)",4,0.002,0.01,https://www.lcsc.com/product-detail/C1562.html
-"1k Ohm 1% SMD Resistors - Crystal damping, BOOTSEL, LED (0402, JLCPCB C11702)",6,0.0013,0.01,https://www.lcsc.com/product-detail/C11702.html
-"1uF 25V X5R Ceramic Capacitors - VREG In/Out (0402, JLCPCB C52923)",4,0.0063,0.03,https://www.lcsc.com/product-detail/C52923.html
-"100nF 16V X7R Decoupling & Filter Capacitors (0402, JLCPCB C1525)",36,0.0031,0.11,https://www.lcsc.com/product-detail/C1525.html
-"10uF 10V X5R Bulk Ceramic Capacitors - LDO Decoupling (0603, JLCPCB C19702)",4,0.0203,0.08,https://www.lcsc.com/product-detail/C19702.html
-"10k Ohm 1% SMD Resistors - QSPI SS, RUN, NTC, Servo (0402, JLCPCB C25744)",10,0.0018,0.02,https://jlcpcb.com/partdetail/C25744
-"100k Ohm 1% SMD Resistors - Gate Pull-Downs & VBAT Divider (0402, JLCPCB C25741)",8,0.0013,0.01,https://jlcpcb.com/partdetail/C25741
-"100 Ohm 1% SMD Resistors - MOSFET Gate Series (0402, JLCPCB C25076)",4,0.0012,0.01,https://jlcpcb.com/partdetail/C25076
-"22 Ohm 1% SMD Resistors - USB Full-Speed D+/D- Series (0402, JLCPCB C25092)",4,0.0009,0.01,https://jlcpcb.com/partdetail/C25092
-"AO3400A 30V 5.7A N-Channel MOSFETs - Heater & Servo Power (SOT-23, JLCPCB C20917)",4,0.0888,0.36,https://jlcpcb.com/partdetail/AO3400A/C20917
-"KT-0805G SMD Green Status LED (0805, JLCPCB C2297)",2,0.0164,0.03,https://jlcpcb.com/partdetail/C2297
-"Custom 4-Layer CanSat Flight PCB (52mm round, 1.6mm FR-4, 5 pcs)",5,0.4,2.0,https://jlcpcb.com
-"JLCPCB SMT Assembly Service (Setup, Stencil, 314 solder joints, 2 assembled boards)",1,13.28,13.28,https://jlcpcb.com
-Ai-Thinker Ra-02 SX1278 433MHz LoRa Radio Module (LCSC C90039),1,7.1,7.1,https://www.lcsc.com/product-detail/C90039.html
-"Microchip MCP1700-3302E/TO 3.3V 250mA Low-Quiescent LDO (TO-92, LCSC C511277)",1,1.09,1.09,https://www.lcsc.com/product-detail/C511277.html
-"100uF 16V Radial Electrolytic Capacitor - Servo Bulk (D5xL7mm, LCSC C43803)",50,0.0196,0.98,https://www.lcsc.com/product-detail/C43803.html
-JST PH 2.0mm 2-Pin Shrouded Male Header - LiPo Connector (LCSC C131337),20,0.0359,0.72,https://www.lcsc.com/product-detail/C131337.html
-BAT Wireless 433MHz Helical Spring Antenna 21mm (LCSC C496554),5,0.1476,0.74,https://www.lcsc.com/product-detail/C496554.html
-SOFNG SS-12D00-G3 SPDT Sub-Miniature Power Slide Switch (LCSC C22355741),1,0.03,0.03,https://www.lcsc.com/product-detail/C22355741.html
-Yageo 15 Ohm 2W 5% Metal Film Power Resistor - Chamber A Heater (LCSC C176558),10,0.0564,0.56,https://lcsc.com/product-detail/Through-Hole-Resistors_YAGEO-MFR2WSJT-73-15R_C176558.html
-Adafruit ADXL375 +/-200g High-G 3-Axis Digital Accelerometer Breakout,1,27.19,27.19,https://www.ebay.co.uk/itm/206302238266
-GY-BMP280-3.3 High-Precision Digital Barometer / Altimeter Breakout,1,1.59,1.59,https://www.ebay.co.uk/itm/375823142585
-10k Ohm NTC High-Precision Thin-Film Thermistors (Pack of 2 - Chamber A & B),1,2.65,2.65,https://www.ebay.co.uk/itm/172602710821
-103450 3.7V 2000mAh Protected LiPo Flat Pouch Battery with JST-PH 2.0 Plug,1,1.32,1.32,https://www.aliexpress.com/item/1005002919536938.html
-TP4056 USB-C 1A Lithium Battery Charging Board with Dual Protection ICs,1,2.27,2.27,https://www.ebay.co.uk/itm/900026123899
-TowerPro MG90S Micro Metal-Gear 180-Degree Servo - Leg Release Mechanism,1,4.41,4.41,https://www.ebay.co.uk/itm/188944133546
-Ripstop Nylon Fabric 0.5m x 1.5m - 38cm Octo-Annular Parachute Canopy,1,4.2,4.2,https://www.ebay.co.uk/itm/124789110629
-"Rolling Barrel Swivels Size 2/4 (35kg-43kg Test, Pack of 10) - Parachute Rigging",1,4.52,4.52,https://www.ebay.co.uk/itm/122172655412
-"M3 x 300mm A2 Stainless Steel Allthread Rods (Pack of 2, cut to 3x 115mm tie-rods)",1,4.93,4.93,https://amzn.eu/d/0aMMNgs8
-M3 A2 Stainless Steel Lifting Eye Bolt - Structural Parachute Bridle Anchor,1,2.87,2.87,https://www.ebay.co.uk/itm/323003622859
-"TSL2591 High Dynamic Range Digital Light Sensor Modules (2 pcs, Dual Chamber I2C)",1,9.65,9.65,https://a.aliexpress.com/_EHluWfg
-IPEX / U.FL to Female SMA / Pigtail RF Coaxial Cable for Ra-02 Antenna,1,1.85,1.85,https://www.ebay.co.uk/itm/283186629071
-Pyrocystis lunula Bioluminescent Dinoflagellate Algae Starter Culture,1,23.8,23.8,https://www.darwinbiological.co.uk/products/pyrocystis-lunula?variant=39852527976623
-Marine Algae Growth Medium Vial - Makes 1L Nutrient Enrichment,1,9.53,9.53,https://www.darwinbiological.co.uk/products/marine-algae-growth-medium?variant=42611785892015
-3D-Printed Airframe & 3-Leg Landing Gear (PETG / TPU Filament),1,0.0,0.0,School / Lab Stock
-M3 Stainless Steel Nyloc Lock Nuts & Flat Washers (12-pack),1,0.0,0.0,School / Lab Stock
-550 Paracord Shock Cord & Shroud Lines (10m),1,0.0,0.0,School / Workshop Stock
-Scrap Steel Ballast Weights (~62g lower base hatch ballast),1,0.0,0.0,School / Workshop Stock
-USB-A to Micro/Stripped 4-Wire Programming Lead,1,0.0,0.0,School / Lab Stock
-Tax & shipping for the whole order,-,-,$64.56,-
+Item,Qty,Supplier,Cost/item,Total Cost,link
+"RP2040 32-bit Dual ARM Cortex-M0+ MCU, LCSC C2040 (U1)",2,LCSC,$1.09,$2.17,https://www.lcsc.com/product-detail/C2040.html
+"Winbond W25Q128JVSIQ 16MB QSPI Flash, LCSC C97521 (U2)",2,LCSC,$2.33,$4.65,https://www.lcsc.com/product-detail/C97521.html
+"YXC 12MHz 20pF SMD Crystal 3225 4-pin, LCSC C9002 (Y1)",2,LCSC,$0.10,$0.19,https://www.lcsc.com/product-detail/C9002.html
+"33pF 50V C0G Crystal Load Cap 0402, LCSC C1562 (C10, C11)",4,LCSC,$0.002,$0.01,https://www.lcsc.com/product-detail/C1562.html
+"1k Ohm 1% SMD Resistor 0402, LCSC C11702 (R1, R4, R12)",6,LCSC,$0.0013,$0.01,https://www.lcsc.com/product-detail/C11702.html
+"1uF 25V X5R Ceramic Cap 0402, LCSC C52923 (C13, C16)",4,LCSC,$0.0063,$0.03,https://www.lcsc.com/product-detail/C52923.html
+"100nF 16V X7R Ceramic Cap 0402, LCSC C1525 (C1-C9, C14, C15, C18-C21, C23-C25)",36,LCSC,$0.0031,$0.11,https://www.lcsc.com/product-detail/C1525.html
+"10uF 10V X5R Ceramic Cap 0603, LCSC C19702 (C12, C17)",4,LCSC,$0.0203,$0.08,https://www.lcsc.com/product-detail/C19702.html
+"10k Ohm 1% SMD Resistor 0402, LCSC C25744 (R5, R6, R13, R14, R17)",10,JLCPCB,$0.0018,$0.02,https://jlcpcb.com/partdetail/C25744
+"100k Ohm 1% SMD Resistor 0402, LCSC C25741 (R9, R11, R15, R16)",8,JLCPCB,$0.0013,$0.01,https://jlcpcb.com/partdetail/C25741
+"100 Ohm 1% SMD Resistor 0402, LCSC C25076 (R7, R10)",4,JLCPCB,$0.0012,$0.01,https://jlcpcb.com/partdetail/C25076
+"22 Ohm 1% SMD Resistor 0402, LCSC C25092 (R2, R3)",4,JLCPCB,$0.0009,$0.01,https://jlcpcb.com/partdetail/C25092
+"AO3400A 30V 5.7A N-MOSFET SOT-23, LCSC C20917 (Q1, Q2)",4,JLCPCB,$0.09,$0.36,https://jlcpcb.com/partdetail/AO3400A/C20917
+"KT-0805G SMD Green Status LED 0805, LCSC C2297 (D1)",2,JLCPCB,$0.02,$0.03,https://jlcpcb.com/partdetail/C2297
+"Custom 4-layer CanSat flight PCB, 5 pcs (52mm round 1.6mm FR-4)",5,JLCPCB,$0.40,$2.00,https://jlcpcb.com
+"JLCPCB SMT Assembly Service (Setup, Stencil, 314 joints, 2 assembled boards)",1,JLCPCB,$13.28,$13.28,https://jlcpcb.com
+"Ai-Thinker Ra-02 SX1278 433MHz LoRa Module, LCSC C90039 (U5)",1,LCSC,$7.10,$7.10,https://www.lcsc.com/product-detail/C90039.html
+"Microchip MCP1700-3302E/TO 3.3V 250mA LDO TO-92, LCSC C511277 (U3)",1,LCSC,$1.09,$1.09,https://www.lcsc.com/product-detail/C511277.html
+"100uF 16V Radial Electrolytic Cap D5xL7mm, LCSC C43803 (C22)",50,LCSC,$0.02,$0.98,https://www.lcsc.com/product-detail/C43803.html
+"JST PH 2.0mm 2-Pin Shrouded Male Header, LCSC C131337 (J1)",20,LCSC,$0.04,$0.72,https://www.lcsc.com/product-detail/C131337.html
+"BAT Wireless 433MHz Helical Spring Antenna 21mm, LCSC C496554",5,LCSC,$0.15,$0.74,https://www.lcsc.com/product-detail/C496554.html
+"SOFNG SS-12D00-G3 SPDT Sub-Mini Slide Switch, LCSC C22355741 (SW1)",1,LCSC,$0.03,$0.03,https://www.lcsc.com/product-detail/C22355741.html
+"Yageo 15 Ohm 2W 5% Power Resistor, LCSC C176558 (R8)",10,LCSC,$0.06,$0.56,https://lcsc.com/product-detail/Through-Hole-Resistors_YAGEO-MFR2WSJT-73-15R_C176558.html
+Adafruit ADXL375 +/-200g High-G 3-Axis Accelerometer Breakout (U4),1,eBay UK,$27.19,$27.19,https://www.ebay.co.uk/itm/206302238266
+GY-BMP280-3.3 High-Precision Digital Barometer / Altimeter Breakout (U6),1,eBay UK,$1.59,$1.59,https://www.ebay.co.uk/itm/375823142585
+"10k Ohm NTC Thin-Film Thermistors, pack of 2 (TH1, TH2)",1,eBay UK,$2.65,$2.65,https://www.ebay.co.uk/itm/172602710821
+103450 3.7V 2000mAh Protected LiPo Battery with JST-PH 2.0 Plug,1,AliExpress,$1.32,$1.32,https://www.aliexpress.com/item/1005002919536938.html
+TP4056 USB-C 1A Lithium Battery Charging Board with Protection,1,eBay UK,$2.27,$2.27,https://www.ebay.co.uk/itm/900026123899
+TowerPro MG90S Micro Metal-Gear 180-Degree Servo (J6),1,eBay UK,$4.41,$4.41,https://www.ebay.co.uk/itm/188944133546
+Ripstop Nylon Fabric 0.5m x 1.5m - 38cm Parachute Canopy,1,eBay UK,$4.20,$4.20,https://www.ebay.co.uk/itm/124789110629
+"Rolling Barrel Swivels Size 2/4 (35-43kg Test, Pack of 10)",1,eBay UK,$4.52,$4.52,https://www.ebay.co.uk/itm/122172655412
+"M3 x 300mm A2 Stainless Steel Allthread Rods, Pack of 2 (3x 115mm tie-rods)",1,Amazon UK,$4.93,$4.93,https://amzn.eu/d/0aMMNgs8
+M3 A2 Stainless Steel Lifting Eye Bolt - Parachute Anchor,1,eBay UK,$2.87,$2.87,https://www.ebay.co.uk/itm/323003622859
+"TSL2591 High Dynamic Range Digital Light Sensor Modules, 2 pcs (U7, U8)",1,AliExpress,$9.65,$9.65,https://a.aliexpress.com/_EHluWfg
+IPEX / U.FL to Female SMA / Pigtail RF Coaxial Cable for Ra-02,1,eBay UK,$1.85,$1.85,https://www.ebay.co.uk/itm/283186629071
+Pyrocystis lunula Bioluminescent Dinoflagellate Algae Starter Culture,1,Darwin Biological,$23.80,$23.80,https://www.darwinbiological.co.uk/products/pyrocystis-lunula?variant=39852527976623
+Marine Algae Growth Medium Vial - Makes 1L Nutrient Enrichment,1,Darwin Biological,$9.53,$9.53,https://www.darwinbiological.co.uk/products/marine-algae-growth-medium?variant=42611785892015
+3D-Printed Airframe & 3-Leg Landing Gear (PETG / TPU Filament),1,School / Lab Stock,$0.00,$0.00,
+M3 Stainless Steel Nyloc Lock Nuts & Flat Washers (12-pack),1,School / Lab Stock,$0.00,$0.00,
+550 Paracord Shock Cord & Shroud Lines (10m),1,Workshop Stock,$0.00,$0.00,
+Scrap Steel Ballast Weights (~62g lower base hatch ballast),1,Workshop Stock,$0.00,$0.00,
+USB-A to Micro/Stripped 4-Wire Programming Lead,1,Lab Stock,$0.00,$0.00,
+Estimated total shipping,1,,,$64.56,
