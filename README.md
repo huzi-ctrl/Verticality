@@ -173,7 +173,7 @@ Packed with `struct.pack("<HBIIhhhIIHHHBH", ...)` ($34\text{ bytes}$ total, $\si
 
 ## 7. Complete Verified Bill of Materials (`$199.53` USD / `£154.10` Total inc. VAT & Delivery)
 
-The authoritative project bom is tracked in [`bom.csv`](./BOM.csv) (formatted for Hack Club Half-Life in USD), [`CanSat_schematic_to_BOM_map.csv`](./CanSat_schematic_to_BOM_map.csv), and [`CanSat_BOM_verified_direct_links_2 (1).xlsx`](./CanSat_BOM_verified_direct_links_2%20(1).xlsx), split across 5 orders:
+The authoritative project bom is tracked in [`bom.csv`](./BOM.csv) (formatted for Hack Club Half-Life in USD), [`CanSat_schematic_to_bom_map.csv`](./CanSat_schematic_to_bom_map.csv), and [`CanSat_bom_verified_direct_links_2 (1).xlsx`](./CanSat_bom_verified_direct_links_2%20(1).xlsx), split across 5 orders:
 - **Order 1 — JLCPCB PCB + Top-Side SMT Assembly ([`production/bom_jlcpcb.csv`](./production/bom_jlcpcb.csv))**: 14 unique SMT lines (**46 placed parts**, **157 SMT joints/board**, 2 assembled boards, 5 bare 4-layer boards) = **$15.28 USD** / **£40.41** (inc. 20% VAT & shipping).
 - **Order 2 — LCSC Hand-Fit Basket**: `U5` (`Ra-02`), `U3` (`MCP1700-3302E/TO`), `C22` ($100\text{ }\mu\text{F}$), `J1` (`JST-PH`), `SW1` (`SS-12D00G3`), `R8` ($15\text{ }\Omega$ $2\text{ W}$ axial heater), and $433\text{ MHz}$ helical antenna = **$11.22 USD** / **£22.09** (inc. 20% VAT & shipping).
 - **Order 3 — UK / Overseas Modules & Mechanical Hardware**: `U4` (`Adafruit ADXL375`), `U6` (`GY-BMP280-3.3`), `U7`/`U8` (`2x TSL2591`), `TH1`/`TH2` (`2x 10k NTC`), `103450` $2000\text{ mAh}$ LiPo pouch cell, `TP4056` charger, `MG90S` servo, ripstop nylon, barrel swivels, M3 stainless tie-rods, lifting eyebolt, and U.FL pigtail = **$70.83 USD** / **£52.59** (inc. VAT & delivery).
@@ -221,8 +221,8 @@ CanSat/
 ├── ERC.rpt                         # Official KiCad ERC Report (0 errors)
 ├── schematic.pdf                   # Exported Vector Schematic PDF
 ├── BOM.csv                         # Complete Verified Project bom for Hack Club ($199.53 USD total / £154.10 inc. tax & shipping)
-├── CanSat_schematic_to_BOM_map.csv # Authoritative Designator-to-bom & Placement Map (72 schematic parts)
-├── CanSat_BOM_verified_direct_links_2 (1).xlsx # Verified Pricing & Direct Supplier Links Spreadsheet
+├── CanSat_schematic_to_bom_map.csv # Authoritative Designator-to-bom & Placement Map (72 schematic parts)
+├── CanSat_bom_verified_direct_links_2 (1).xlsx # Verified Pricing & Direct Supplier Links Spreadsheet
 ├── production/                     # Ready-to-Order JLCPCB Manufacturing Package
 │   ├── gerbers.zip                 # 4-Layer Gerber + Excellon Drill Archive (regenerated from final PCB)
 │   ├── bom_jlcpcb.csv              # JLCPCB SMT Assembly bom (14 lines / 46 SMT parts / 157 joints only)
