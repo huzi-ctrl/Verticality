@@ -164,8 +164,6 @@ All flight and ground-station software is located in the [`firmware/`](firmware/
 ├── gerbers.zip                   # Ready-to-order JLCPCB 4-Layer Gerber + Excellon Drill Archive
 ├── schematic.pdf                 # Vector PDF Schematic Export
 ├── bom.csv                       # Full Bill of Materials with Direct Supplier Links
-├── cad/
-│   └── CanSat.step               # Full 3D CAD STEP Assembly of the PCB
 ├── production/
 │   ├── gerbers.zip               # Manufacturing Gerber + Drill Archive
 │   ├── bom_jlcpcb.csv            # JLCPCB SMT Assembly BOM with LCSC Part Numbers
