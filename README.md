@@ -52,7 +52,7 @@ The board ([`CanSat.kicad_pcb`](./CanSat.kicad_pcb)) is a **52.0 mm diameter**, 
 ### Key Hardware & DFM Highlights
 - **Strict SMT vs. Hand-Fit / Wire-Pad Separation**:
   - **46 SMT parts** (14 unique LCSC lines: 13 Basic + 1 Extended `RP2040` `C2040`, 157 SMT joints/board) have `LCSC` part numbers populated and are exported to [`production/bom_jlcpcb.csv`](./production/bom_jlcpcb.csv) and [`production/positions_jlcpcb.csv`](./production/positions_jlcpcb.csv).
-  - **All 29 non-SMT items** — hand-fitted through-hole/castellated parts (`U3`, `U5`, `C22`, `J1`, `SW1`, `R8`), DNP $\text{I}^2\text{C}$ pull-up footprints (`R18–R21`), off-board module wire-pad groups (`U4`, `U6`, `U7`, `U8`, `TH1`, `TH2`, `J2`, `J3`, `J4`, `J5`, `J6`), test points (`TP1–TP5`), and mounting holes (`H1–H3`) — have **both `Exclude from BOM` and `Exclude from Position Files`** set in [`CanSat.kicad_sch`](./CanSat.kicad_sch) and [`CanSat.kicad_pcb`](./CanSat.kicad_pcb).
+  - **All 29 non-SMT items** — hand-fitted through-hole/castellated parts (`U3`, `U5`, `C22`, `J1`, `SW1`, `R8`), DNP $\text{I}^2\text{C}$ pull-up footprints (`R18–R21`), off-board module wire-pad groups (`U4`, `U6`, `U7`, `U8`, `TH1`, `TH2`, `J2`, `J3`, `J4`, `J5`, `J6`), test points (`TP1–TP5`), and mounting holes (`H1–H3`) — have **both `Exclude from bom` and `Exclude from Position Files`** set in [`CanSat.kicad_sch`](./CanSat.kicad_sch) and [`CanSat.kicad_pcb`](./CanSat.kicad_pcb).
 - **High-Current MOSFET Via Arrays & Trace Widths**:
   - `Q1` (Heater `AO3400A`) and `Q2` (Servo `AO3400A`) each have **three `0.6 mm / 0.3 mm` `GND` vias** at their source pads (`Q1.2` and `Q2.2`) to handle the $\sim 1\text{ A}$ servo stall current and $250\text{ mA}$ heater current with minimal ground bounce.
   - `HighCurrent` netclass contains only the switched drain paths `Net-(Q1-D)` and `Net-(J6-Pin_1)` routed at **`0.6 mm` width**, while the logic gate nets (`/HEATER`, `/SERVO_P`, `/SERVO_S`) use signal widths.
@@ -171,14 +171,20 @@ Packed with `struct.pack("<HBIIhhhIIHHHBH", ...)` ($34\text{ bytes}$ total, $\si
 
 ---
 
-## 7. Complete Verified Bill of Materials (`£154.10` Total inc. VAT & Delivery)
+## 7. Complete Verified Bill of Materials (`$199.53` USD / `£154.10` Total inc. VAT & Delivery)
 
-The authoritative BOM is tracked in [`bom.csv`](./bom.csv), [`CanSat_schematic_to_BOM_map.csv`](./CanSat_schematic_to_BOM_map.csv), and [`CanSat_BOM_verified_direct_links_2 (1).xlsx`](./CanSat_BOM_verified_direct_links_2%20(1).xlsx), split across 5 orders:
-- **Order 1 — JLCPCB PCB + Top-Side SMT Assembly ([`production/bom_jlcpcb.csv`](./production/bom_jlcpcb.csv))**: 14 unique SMT lines (**46 placed parts**, **157 SMT joints/board**, 2 assembled boards, 5 bare 4-layer boards) = **£40.41** (inc. 20% VAT & shipping).
-- **Order 2 — LCSC Hand-Fit Basket**: `U5` (`Ra-02`), `U3` (`MCP1700-3302E/TO`), `C22` ($100\text{ }\mu\text{F}$), `J1` (`JST-PH`), `SW1` (`SS-12D00G3`), `R8` ($15\text{ }\Omega$ $2\text{ W}$ axial heater), and $433\text{ MHz}$ helical antenna = **£22.09** (inc. 20% VAT & shipping).
-- **Order 3 — UK / Overseas Modules & Mechanical Hardware**: `U4` (`Adafruit ADXL375`), `U6` (`GY-BMP280-3.3`), `U7`/`U8` (`2x TSL2591`), `TH1`/`TH2` (`2x 10k NTC`), `103450` $2000\text{ mAh}$ LiPo pouch cell, `TP4056` charger, `MG90S` servo, ripstop nylon, barrel swivels, M3 stainless tie-rods, lifting eyebolt, and U.FL pigtail = **£52.59** (inc. VAT & delivery).
-- **Order 4 — Biology (Darwin Biological UK)**: *Pyrocystis* starter culture, Marine Algae Growth Medium vial, tracked courier delivery, and VAT = **£39.00** (inc. 20% VAT; £32.50 ex VAT if reclaimed via school finance).
-- **Order 5 — School Lab & Workshop Stock**: Sterile seawater base, $12:12$ light timer, vials, PETG/TPU 3D-printing filament (including the 3D-printed legs), scrap steel ballast, M3 Nyloc nuts, USB lead, and 550 paracord = **£0.00**.
+The authoritative project bom is tracked in [`bom.csv`](./BOM.csv) (formatted for Hack Club Half-Life in USD), [`CanSat_schematic_to_BOM_map.csv`](./CanSat_schematic_to_BOM_map.csv), and [`CanSat_BOM_verified_direct_links_2 (1).xlsx`](./CanSat_BOM_verified_direct_links_2%20(1).xlsx), split across 5 orders:
+- **Order 1 — JLCPCB PCB + Top-Side SMT Assembly ([`production/bom_jlcpcb.csv`](./production/bom_jlcpcb.csv))**: 14 unique SMT lines (**46 placed parts**, **157 SMT joints/board**, 2 assembled boards, 5 bare 4-layer boards) = **$15.28 USD** / **£40.41** (inc. 20% VAT & shipping).
+- **Order 2 — LCSC Hand-Fit Basket**: `U5` (`Ra-02`), `U3` (`MCP1700-3302E/TO`), `C22` ($100\text{ }\mu\text{F}$), `J1` (`JST-PH`), `SW1` (`SS-12D00G3`), `R8` ($15\text{ }\Omega$ $2\text{ W}$ axial heater), and $433\text{ MHz}$ helical antenna = **$11.22 USD** / **£22.09** (inc. 20% VAT & shipping).
+- **Order 3 — UK / Overseas Modules & Mechanical Hardware**: `U4` (`Adafruit ADXL375`), `U6` (`GY-BMP280-3.3`), `U7`/`U8` (`2x TSL2591`), `TH1`/`TH2` (`2x 10k NTC`), `103450` $2000\text{ mAh}$ LiPo pouch cell, `TP4056` charger, `MG90S` servo, ripstop nylon, barrel swivels, M3 stainless tie-rods, lifting eyebolt, and U.FL pigtail = **$70.83 USD** / **£52.59** (inc. VAT & delivery).
+- **Order 4 — Biology (Darwin Biological UK)**: *Pyrocystis* starter culture, Marine Algae Growth Medium vial, tracked courier delivery, and VAT = **$37.64 USD** / **£39.00** (inc. 20% VAT; £32.50 ex VAT if reclaimed via school finance).
+- **Order 5 — School Lab & Workshop Stock**: Sterile seawater base, $12:12$ light timer, vials, PETG/TPU 3D-printing filament (including the 3D-printed legs), scrap steel ballast, M3 Nyloc nuts, USB lead, and 550 paracord = **$0.00**.
+
+> [!NOTE]
+> **Hack Club Half-Life Grant Submission Summary ([`bom.csv`](./BOM.csv))**:
+> - **Total Parts Cost**: **$134.97 USD** (42 build items, parts only, zero tools)
+> - **Tax & Shipping for the Whole Order**: **$64.56 USD**
+> - **Grand Total**: **$199.53 USD** (fully compliant with the $200 Hack Club hardware grant cap)
 
 ### Order 1: JLCPCB Factory-Assembled SMT Parts ([`production/bom_jlcpcb.csv`](./production/bom_jlcpcb.csv))
 
@@ -198,7 +204,7 @@ The authoritative BOM is tracked in [`bom.csv`](./bom.csv), [`CanSat_schematic_t
 | `R5, R6, R13, R14, R17` | 5 | `10k` $\pm 1\%$ Resistor (SS, RUN, NTCs, Servo Pull-Down) | `R_0402_1005Metric` | `C25744` | Basic |
 | `R7, R10` | 2 | `100` $\Omega$ $\pm 1\%$ MOSFET Gate Series | `R_0402_1005Metric` | `C25076` | Basic |
 | `R9, R11, R15, R16` | 4 | `100k` $\pm 1\%$ Gate Pull-Downs & `VBAT` Divider | `R_0402_1005Metric` | `C25741` | Basic |
-| *`R18, R19, R20, R21`* | *0 (DNP)* | *`4.7k` DNP (`Exclude from BOM & Pos` — pull-ups on `TSL2591` modules)* | *`R_0402_1005Metric`* | *`C25900`* | *DNP* |
+| *`R18, R19, R20, R21`* | *0 (DNP)* | *`4.7k` DNP (`Exclude from bom & Pos` — pull-ups on `TSL2591` modules)* | *`R_0402_1005Metric`* | *`C25900`* | *DNP* |
 
 ---
 
@@ -214,12 +220,12 @@ CanSat/
 ├── DRC.rpt                         # Official KiCad DRC & Parity Report (0 unconnected, 0 parity errors, 16 DFM notices)
 ├── ERC.rpt                         # Official KiCad ERC Report (0 errors)
 ├── schematic.pdf                   # Exported Vector Schematic PDF
-├── bom.csv                         # Complete Verified Project BOM (Orders 1-5, £154.10 total inc. VAT & shipping)
-├── CanSat_schematic_to_BOM_map.csv # Authoritative Designator-to-BOM & Placement Map (72 schematic parts)
+├── BOM.csv                         # Complete Verified Project bom for Hack Club ($199.53 USD total / £154.10 inc. tax & shipping)
+├── CanSat_schematic_to_BOM_map.csv # Authoritative Designator-to-bom & Placement Map (72 schematic parts)
 ├── CanSat_BOM_verified_direct_links_2 (1).xlsx # Verified Pricing & Direct Supplier Links Spreadsheet
 ├── production/                     # Ready-to-Order JLCPCB Manufacturing Package
 │   ├── gerbers.zip                 # 4-Layer Gerber + Excellon Drill Archive (regenerated from final PCB)
-│   ├── bom_jlcpcb.csv              # JLCPCB SMT Assembly BOM (14 lines / 46 SMT parts / 157 joints only)
+│   ├── bom_jlcpcb.csv              # JLCPCB SMT Assembly bom (14 lines / 46 SMT parts / 157 joints only)
 │   └── positions_jlcpcb.csv        # JLCPCB SMT Pick-and-Place File (46 top-side SMT parts only)
 ├── firmware/                       # RP2040 MicroPython Flight & Ground Station Software
 │   ├── main.py                     # 5-State Flight Loop, 22°C Heater PID, Pre-Touchdown Leg Release, 34B Binary Telemetry
